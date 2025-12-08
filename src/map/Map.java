@@ -3,6 +3,7 @@ package map;
 import core.Game;
 import physics.Size;
 import gfx.TileLibrary;
+import tile.TileScale;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -21,8 +22,8 @@ public abstract class Map {
     protected int[][] mapTiles;
 
     public Map(int width, int height){
-        this.widthInPx = width * Game.SPRITE_SIZE;
-        this.heightInPx = height * Game.SPRITE_SIZE;
+        this.widthInPx = TileScale.of(width);
+        this.heightInPx = TileScale.of(height);
         this.tileWidth = width;
         this.tileHeight = height;
         this.cellSize = Game.SPRITE_SIZE;
@@ -58,5 +59,16 @@ public abstract class Map {
         return heightInPx;
     }
 
-    public abstract void render(Graphics2D g);
+    public void render(Graphics2D g) {
+        for (int row = 0; row < tileHeight; row++) {
+            for (int col = 0; col < tileWidth; col++) {
+
+                int tileNum = mapTiles[col][row]; // <-- update per tile
+                int x = col * Game.SPRITE_SIZE;
+                int y = row * Game.SPRITE_SIZE;
+
+                g.drawImage(tl.getTile(tileNum).getTile(), x, y, null);
+            }
+        }
+    }
 }

@@ -4,6 +4,7 @@ public class Position {
 
     private double x;
     private double y;
+    private double prevX, prevY;
 
     public Position(double x, double y) {
         this.x = x;

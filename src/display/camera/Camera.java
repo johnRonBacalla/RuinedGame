@@ -1,6 +1,8 @@
-package camera;
+package display.camera;
 
-import javax.swing.text.html.parser.Entity;
+import entity.GameObject;
+
+import java.awt.*;
 
 public class Camera {
 
@@ -16,8 +18,8 @@ public class Camera {
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
 
-        this.deadZoneX = width / 4f;
-        this.deadZoneY = height / 4f;
+        this.deadZoneX = width / 2f;
+        this.deadZoneY = height / 2f;
     }
 
     public void focusOn(float targetX, float targetY){
@@ -44,7 +46,7 @@ public class Camera {
             if(x < 0) x = 0;
             if(x + width > worldWidth) x = worldWidth - width;
         } else {
-            x = (worldWidth - width) / 2f; // center camera if map is smaller
+            x = (worldWidth - width) / 2f; // center display.camera if map is smaller
         }
 
         // Vertical
@@ -52,7 +54,7 @@ public class Camera {
             if(y < 0) y = 0;
             if(y + height > worldHeight) y = worldHeight - height;
         } else {
-            y = (worldHeight - height) / 2f; // center camera if map is smaller
+            y = (worldHeight - height) / 2f; // center display.camera if map is smaller
         }
     }
 
@@ -62,5 +64,24 @@ public class Camera {
 
     public float getY() {
         return y;
+    }
+
+    public void setWorldSize(int widthInPx, int heightInPx) {
+        this.worldWidth = widthInPx;
+        this.worldHeight = heightInPx;
+    }
+
+    public void update(GameObject entity){
+        this.focusOn(
+                (float) entity.getPosition().getX() + entity.getFrame().getWidth() / 2f,
+                (float) entity.getPosition().getY() + entity.getFrame().getHeight() / 2f);
+    }
+
+    public void apply(Graphics2D g){
+        g.translate(-x, -y);
+    }
+
+    public void reset(Graphics2D g){
+        g.translate(x, y);
     }
 }

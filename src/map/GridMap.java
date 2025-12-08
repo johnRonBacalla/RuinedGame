@@ -10,7 +10,7 @@ public class GridMap extends Map{
 
     @Override
     public void render(Graphics2D g) {
-        g.setColor(Color.GRAY);
+        g.setColor(Color.BLUE);
 
         // vertical lines
         for (int x = 0; x <= widthInPx; x += cellSize) {

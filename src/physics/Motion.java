@@ -7,8 +7,8 @@ public class Motion {
     private Vector vector;          // current velocity
     private double speed;           // max speed
 
-    private double acceleration = 0.35;
-    private double deceleration = 0.35;
+    private double acceleration = 0.45;
+    private double deceleration = 0.45;
     private double velocityX = 0;
     private double velocityY = 0;
 
@@ -31,14 +31,12 @@ public class Motion {
             velocityX += inputX * acceleration;
         } else {
             // --- DECELERATION X ---
-            if (inputX  == 0){
-                if(velocityX > 0) {
-                    velocityX -= deceleration;
-                    if(velocityX < 0) velocityX = 0; // clamp
-                } else if (velocityX < 0) {
-                    velocityX += deceleration;
-                    if (velocityX > 0) velocityX = 0; // clamp
-                }
+            if (velocityX > 0) {
+                velocityX -= deceleration;
+                if (velocityX < 0) velocityX = 0;
+            } else if (velocityX < 0) {
+                velocityX += deceleration;
+                if (velocityX > 0) velocityX = 0;
             }
         }
 
@@ -46,14 +44,12 @@ public class Motion {
             velocityY += inputY * acceleration;
         } else {
             // --- DECELERATION Y ---
-            if (inputY == 0) {
-                if (velocityY > 0) {
-                    velocityY -= deceleration;
-                    if (velocityY < 0) velocityY = 0;  // clamp
-                } else if (velocityY < 0) {
-                    velocityY += deceleration;
-                    if (velocityY > 0) velocityY = 0;  // clamp
-                }
+            if (velocityY > 0) {
+                velocityY -= deceleration;
+                if (velocityY < 0) velocityY = 0;
+            } else if (velocityY < 0) {
+                velocityY += deceleration;
+                if (velocityY > 0) velocityY = 0;
             }
         }
 
@@ -75,4 +71,30 @@ public class Motion {
     public boolean isMoving() { return vector.length() > 0.01; }
     public boolean isMovingLeft() { return vector.getX() < 0; }
     public boolean isMovingRight() { return vector.getX() > 0; }
+
+    public void setVelocityX(double velocityX) {
+        this.velocityX = velocityX;
+        updateVector();
+    }
+
+    public void setVelocityY(double velocityY) {
+        this.velocityY = velocityY;
+        updateVector();
+    }
+
+    // --- Stop movement along one axis ---
+    public void stopX() {
+        this.velocityX = 0;
+        updateVector();
+    }
+
+    public void stopY() {
+        this.velocityY = 0;
+        updateVector();
+    }
+
+    // Update the internal vector after velocity changes
+    private void updateVector() {
+        this.vector = new Vector(velocityX, velocityY);
+    }
 }

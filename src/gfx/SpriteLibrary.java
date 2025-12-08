@@ -18,6 +18,8 @@ public class SpriteLibrary {
         loadSheet("playerWalkR", "/sprites/player/walk.png", 9, 64, 64, 0);
         loadSheet("emberIdleL", "/sprites/npc/ember.png", 9, 64, 64, 1);
         loadSheet("objHouse", "/objects/house.png", 1, 186, 212, 0);
+        loadSheet("objTree", "/objects/tree.png", 1, 192, 192, 0);
+
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {

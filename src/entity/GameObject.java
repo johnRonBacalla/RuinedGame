@@ -1,20 +1,20 @@
 package entity;
 
-import physics.Collider;
 import physics.Position;
 import gfx.Animate;
 import gfx.SpriteLibrary;
+import physics.box.Box;
+import physics.box.Collision;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class GameObject {
     protected final Position position;
+    protected Position previousPosition;
     protected SpriteLibrary sprites;
     protected HashMap<String, Animate> animations;
-    protected List<Collider> colliders;
 
     protected Animate currentAnimation;
     protected Animate pendingAnimation;
@@ -22,19 +22,14 @@ public class GameObject {
     protected double switchTimer = 0;
     protected final double SWITCH_DELAY = 0.10;
 
+    protected Box box;
+
     public GameObject(double x, double y, SpriteLibrary sprites) {
         this.position = new Position(x, y);
+        this.previousPosition = new Position(x, y);
         this.sprites = sprites;
         this.animations = new HashMap<>();
-        this.colliders = new ArrayList<>();
-    }
-
-    public void addCollider(Collider collider) {
-        colliders.add(collider);
-    }
-
-    public List<Collider> getColliders(){
-        return colliders;
+        this.box = new Collision(this, 0, 0, 0, 0);
     }
 
     public BufferedImage getFrame() {
@@ -45,5 +40,26 @@ public class GameObject {
         currentAnimation.update();
     }
 
+    public void render(Graphics2D g){
+        g.drawImage(
+                getFrame(),
+                getPosition().intX(),
+                getPosition().intY(),
+                null
+        );
+    }
+
+    public void renderBox(Graphics2D g){
+        g.drawRect(
+                (int)box.getX(),
+                (int)box.getY(),
+                (int)box.getWidth(),
+                (int)box.getHeight());
+    }
+
     public Position getPosition() { return position; }
+
+    public Box getBox() {
+        return box;
+    }
 }

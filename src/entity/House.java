@@ -2,18 +2,17 @@ package entity;
 
 import gfx.Animate;
 import gfx.SpriteLibrary;
-import physics.Collider;
+import physics.box.Collision;
+
+import java.awt.*;
 
 public class House extends GameObject{
+
     public House(double x, double y, SpriteLibrary sprites) {
-        super(x, y, sprites);
+        super(x + 20, y, sprites);
 
         animations.put("objHouse", new Animate(sprites.get("objHouse"), 1));
         currentAnimation = animations.get("objHouse");
-        addCollider(new Collider(this,
-                8,
-                (double) currentAnimation.getHeight() / 2 + 15,
-                currentAnimation.getWidth() - 15,
-                (double) currentAnimation.getHeight() / 2 - 25));
+        this.box = new Collision(this, 0, 110, 186, 95);
     }
 }
