@@ -1,4 +1,4 @@
-package music;
+package sound;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
@@ -9,15 +9,19 @@ public class Sound {
     // Constructor: loads the sound file
     public Sound(String filePath) {
         try {
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(
-                    getClass().getResourceAsStream(filePath)
-            );
+            // Load from resources - res/ is already the root
+            var stream = getClass().getClassLoader().getResourceAsStream(filePath);
+            if (stream == null) {
+                throw new IOException("Sound file not found: " + filePath);
+            }
 
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(stream);
             clip = AudioSystem.getClip();
             clip.open(audioStream);
-            audioStream.close(); // close stream after loading
+            audioStream.close();
 
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+        } catch (Exception e) {
+            System.err.println("Could not load sound: " + filePath);
             e.printStackTrace();
         }
     }

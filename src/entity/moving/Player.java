@@ -4,6 +4,7 @@ import physics.box.Box;
 import gfx.Animate;
 import gfx.SpriteLibrary;
 import physics.box.Sensor;
+import sound.Sound;
 
 import java.awt.*;
 import java.util.List;
@@ -12,6 +13,8 @@ public class Player extends MovingEntity {
 
     private int direction = 0;
     private Box sensor;
+    private Sound walkingSound;
+    private boolean wasWalking = false;
 
     public Player(double x, double y, double speed, SpriteLibrary sprites) {
         super(x, y, speed, sprites);
@@ -22,11 +25,14 @@ public class Player extends MovingEntity {
         animations.put("walkR", new Animate(sprites.get("playerWalkR"), 12));
         this.currentAnimation = animations.get("idleR");
         this.sensor = new Sensor(this, 16, 42, 32, 25);
+
+        this.walkingSound = new Sound("sounds/sfx/WalkingSFX.wav");
     }
 
     public void update(List<Box> boxes){
         super.update();
         handleAnimation();
+        handleWalkingSound();
 
         for(Box box : boxes) {
             if (sensor.intersects(box)) {
@@ -81,5 +87,17 @@ public class Player extends MovingEntity {
             if(direction == 0) changeCurrentAnimation("idleR");
             if(direction == 1) changeCurrentAnimation("idleL");
         }
+    }
+
+    private void handleWalkingSound() {
+        boolean isWalking = getMotion().isMoving();
+
+        if (isWalking && !wasWalking) {
+            walkingSound.loop();
+        } else if (!isWalking && wasWalking) {
+            walkingSound.stop();
+        }
+
+        wasWalking = isWalking;
     }
 }
