@@ -3,8 +3,12 @@ package physics.box;
 import entity.GameObject;
 
 public class Event extends Box{
-    public Event(GameObject owner, double offsetX, double offsetY, double width, double height) {
+
+    public String signal;
+
+    public Event(GameObject owner, String signal, double offsetX, double offsetY, double width, double height) {
         super(owner, offsetX, offsetY, width, height);
+        this.signal = signal;
     }
 
     @Override
@@ -13,5 +17,10 @@ public class Event extends Box{
     @Override
     public String getType() {
         return "event";
+    }
+
+    @Override
+    public String getSignal() {
+        return signal;
     }
 }

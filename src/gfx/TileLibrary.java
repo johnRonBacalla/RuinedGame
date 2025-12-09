@@ -10,17 +10,23 @@ public class TileLibrary {
     private ArrayList<Tile> tiles;
     private BufferedImage[] grassDirt;
     private BufferedImage[] dirtGrass;
+    private BufferedImage[] wallWater;
 
     public TileLibrary() {
         this.tiles = new ArrayList<>();
 
-        this.grassDirt = CutSprite.cut(LoadSprite.load("/tiles/grassDirt.png"), 64, 64, 9, 0);
+        this.grassDirt = CutSprite.cut(LoadSprite.load("/tiles/1grassPath.png"), 64, 64, 11, 0);
         for(BufferedImage img: grassDirt){
             tiles.add(new Tile(img, false));
         }
 
-        this.dirtGrass = CutSprite.cut(LoadSprite.load("/tiles/dirtGrass.png"), 64, 64, 9,0);
+        this.dirtGrass = CutSprite.cut(LoadSprite.load("/tiles/2pathGrass.png"), 64, 64, 9,0);
         for(BufferedImage img: dirtGrass){
+            tiles.add(new Tile(img, false));
+        }
+
+        this.wallWater = CutSprite.cut(LoadSprite.load("/tiles/3wall.png"), 64, 64, 39, 0);
+        for(BufferedImage img: wallWater){
             tiles.add(new Tile(img, false));
         }
     }

@@ -30,7 +30,29 @@ public class Player extends MovingEntity {
 
         for(Box box : boxes) {
             if (sensor.intersects(box)) {
-                sensor.onCollide(box);
+                switch(box.getSignal()){
+                    case "null":
+                        sensor.onCollide(box);
+                        break;
+                    case "toBattle":
+                        System.out.println("Going to BattleField");
+                        break;
+                    case "toMines":
+                        System.out.println("Going to Mines");
+                        break;
+                    case "toHouse":
+                        System.out.println("Going to House");
+                        break;
+                    case "fromBattle":
+                        System.out.println("Going from BattleField");
+                        break;
+                    case "fromMines":
+                        System.out.println("Going from Mines");
+                        break;
+                    case "FromHouse":
+                        System.out.println("Going from House");
+                        break;
+                }
             }
         }
     }
