@@ -14,5 +14,10 @@ public class Collision extends Box{
     }
 
     @Override
+    public String getSignal() {
+        return "null";
+    }
+
+    @Override
     public void onCollide(Box other) {}
 }

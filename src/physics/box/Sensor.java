@@ -12,7 +12,6 @@ public class Sensor extends Box {
     @Override
     public void onCollide(Box other) {
         String type = other.getType();
-        System.out.println("Hit by a " + type);
 
         switch (type) {
             case "hit":
@@ -36,6 +35,11 @@ public class Sensor extends Box {
     @Override
     public String getType() {
         return "sensor";
+    }
+
+    @Override
+    public String getSignal() {
+        return "null";
     }
 
     private void triggerEvent(Box other) {

@@ -34,4 +34,6 @@ public abstract class Box {
     public abstract void onCollide(Box other);
 
     public abstract String getType();
+
+    public abstract String getSignal();
 }
