@@ -25,7 +25,7 @@ public class TileLibrary {
             tiles.add(new Tile(img, false));
         }
 
-        this.wallWater = CutSprite.cut(LoadSprite.load("/tiles/3wall.png"), 64, 64, 39, 0);
+        this.wallWater = CutSprite.cut(LoadSprite.load("/tiles/3wall.png"), 64, 64, 41, 0);
         for(BufferedImage img: wallWater){
             tiles.add(new Tile(img, false));
         }
