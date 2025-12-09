@@ -1,11 +1,9 @@
-package entity;
+package entity.stable;
 
+import entity.GameObject;
 import gfx.Animate;
 import gfx.SpriteLibrary;
 import physics.box.Collision;
-import physics.box.Event;
-
-import java.awt.*;
 
 public class Ember extends GameObject {
     public Ember(double x, double y, SpriteLibrary sprites) {

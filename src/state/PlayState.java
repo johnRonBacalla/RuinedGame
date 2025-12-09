@@ -6,6 +6,7 @@ import core.Game;
 import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
+import entity.stable.Invisible;
 import gfx.SpriteLibrary;
 import input.KeyInput;
 import map.MapManager;
@@ -53,6 +54,16 @@ public class PlayState extends State {
 
         // Load map objects from CSV
         List<GameObject> mapObjects = SpawnObjects.loadObjects("/mapText/farmObjs.csv", sprites);
+
+        // Load Border Collisions
+        GameObject topBorder = new Invisible(TileScale.of(0), TileScale.of(0), sprites);
+        GameObject leftBorder = new Invisible(TileScale.of(0), TileScale.of(0), sprites);
+        GameObject bottomBorder = new Invisible(TileScale.of(0), TileScale.of(14), sprites);
+        mapObjects.add(topBorder);
+        mapObjects.add(leftBorder);
+        mapObjects.add(bottomBorder);
+
+        //add all objects to render
         gameObjects.addAll(mapObjects);
 
         // Add their collision boxes to worldBoxes

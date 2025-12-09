@@ -19,7 +19,8 @@ public class SpriteLibrary {
         loadSheet("emberIdleL", "/sprites/npc/ember.png", 9, 64, 64, 1);
         loadSheet("objHouse", "/objects/house.png", 1, 186, 212, 0);
         loadSheet("objTree", "/objects/tree.png", 1, 192, 192, 0);
-
+        loadSheet("invisible", "/sprites/invisible.png",1, 64, 64, 0);
+        loadSheet("objBridge", "/objects/bridge.png", 1, 264, 132, 0);
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {

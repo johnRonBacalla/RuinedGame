@@ -1,6 +1,7 @@
 package physics.box;
 
 import entity.GameObject;
+import tile.TileScale;
 
 public abstract class Box {
 
@@ -36,4 +37,12 @@ public abstract class Box {
     public abstract String getType();
 
     public abstract String getSignal();
+
+    public void setWidthTile(int width){
+        this.width = TileScale.of(width);
+    }
+
+    public void setHeightTile(int height){
+        this.height = TileScale.of(height);
+    }
 }
