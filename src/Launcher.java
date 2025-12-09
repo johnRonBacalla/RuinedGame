@@ -5,7 +5,8 @@ import music.Sound;
 public class Launcher {
 
     public static void main(String[] args){
-
+        Sound menuScreenBGM = new Sound("/sounds/bgm/StoryBoardBGM.mp3");
+        menuScreenBGM.play();
         // Initial JFrame size
         // width = 16 * 64 = 1024px
         // height = 10 * 64 = 640px
