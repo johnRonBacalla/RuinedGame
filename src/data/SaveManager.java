@@ -30,4 +30,38 @@ public class SaveManager {
         }
     }
 
+    public static Map<String, Object> loadGame() {
+        Map<String, Object> data = new HashMap<>();
+        List<String> objects = new ArrayList<>();
+
+        try {
+            File saveFile = new File(SAVE_FILE);
+            if (!saveFile.exists()) {
+                System.out.println("No save file found");
+                return null;
+            }
+
+            BufferedReader reader = new BufferedReader(new FileReader(saveFile));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("WAVE:")) {
+                    int wave = Integer.parseInt(line.split(":")[1]);
+                    data.put("wave", wave);
+                } else {
+                    objects.add(line);
+                }
+            }
+
+            reader.close();
+            data.put("objects", objects);
+            System.out.println("Game loaded!");
+            return data;
+
+        } catch (IOException e) {
+            System.err.println("Load failed: " + e.getMessage());
+            return null;
+        }
+    }
+
 }
