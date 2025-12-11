@@ -11,30 +11,41 @@ import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
 import map.*;
+import physics.Size;
 import physics.box.Box;
 import tile.TileScale;
+import ui.*;
+import ui.buttons.ButtonUI;
+import ui.buttons.InventoryUI;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State {
 
-    private PlayerController controller;
-    private MovingEntity player;
-    private SpriteLibrary sprites;
+    private final PlayerController controller;
+    private final MovingEntity player;
+    private final SpriteLibrary sprites;
 
-    private MapManager mm;
+    private final MapManager mm;
     private Map currentMap;
-    private Map debug;
+    private final Map debug;
 
     private Camera camera;
 
-    private List<GameObject> worldObjects;
-    private List<GameObject> currentObject;
+    private final UI playUi;
+    private final ButtonUI hotBar;
+    private final InventoryUI inventory;
 
-    private List<Box> worldBoxes;
-    private List<Box> currentBox;
+    private final List<GameObject> worldObjects;
+    private final List<GameObject> currentObject;
+
+    private final List<Box> worldBoxes;
+    private final List<Box> currentBox;
+
+    private boolean inventoryOpen;
 
     private Game game;
 
@@ -42,6 +53,7 @@ public class PlayState extends State {
         super(game, input, mouseInput);
 
         this.game = game;
+        playUi = new PlayUI(input, mouseInput);
         controller = new PlayerController(input);
         sprites = new SpriteLibrary();
 
@@ -54,6 +66,12 @@ public class PlayState extends State {
         // Player always separate first
         player = new Player(this, TileScale.of(15), TileScale.of(8), 5, sprites);
         worldObjects.add(player);
+
+        hotBar = new ButtonUI(sprites.getFrame("uiHotBar", 0), new Size(296, 560, 432, 48), () -> {
+            System.out.println("clicked");
+        });
+
+        inventory = new InventoryUI(input, mouseInput);
 
         // Map Manager + debug map
         mm = new MapManager(sprites);
@@ -74,26 +92,54 @@ public class PlayState extends State {
                 currentMap.getWidthInPx(),
                 currentMap.getHeightInPx()
         );
+
+        inventoryOpen = false;
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        UIContainer container = new UIContainer();
+        container.setMargin(new Spacing(10));
+        container.setPadding(12);
+        container.setSize(new Size(5, 5));
+        uiContainers.add(container);
+
+        UIText text = new UIText("123456789");
+        container.add((text));
     }
 
     @Override
     public void update() {
-        // Update player input & motion
-        player.getMotion().update(controller);
-        player.applyMotion();
 
-        // Update all objects
-        for (GameObject obj : worldObjects) {
-            if (obj instanceof Player p) {
-                p.update(worldBoxes); // player checks collisions
-            } else {
-                obj.update(); // other objects normally
+        uiContainers.forEach(uiContainer -> uiContainer.update());
+        if(input.isPressed(KeyEvent.VK_E)){
+            inventoryOpen = !inventoryOpen;
+            System.out.println("Inventory toggled");
+        }
+
+        if(!inventoryOpen){
+            // Update player input & motion
+            player.getMotion().update(controller);
+            player.applyMotion();
+
+            // Update all objects
+            for (GameObject obj : worldObjects) {
+                if (obj instanceof Player p) {
+                    p.update(worldBoxes); // player checks collisions
+                } else {
+                    obj.update(); // other objects normally
+                }
             }
         }
 
         // Maintain draw order
         sortObjectsByPosition();
 
+        playUi.update();
+        hotBar.update(mouseInput);
+        if(inventoryOpen){
+            inventory.update(mouseInput);
+        }
         // Camera follows player
         camera.update(player);
     }
@@ -163,7 +209,21 @@ public class PlayState extends State {
                 obj.renderBox(g);
             }
         }
+
         camera.reset(g);
+
+        uiContainers.forEach(uiContainer -> g.drawImage(
+                uiContainer.getSprite(),
+                uiContainer.getPosition().intX(),
+                uiContainer.getPosition().intY(),
+                null
+        ));
+
+        playUi.render(g);
+        hotBar.render(g);
+        if(inventoryOpen){
+            inventory.render(g);
+        }
     }
 
     public void clearAll(){

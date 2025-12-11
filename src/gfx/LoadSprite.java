@@ -1,7 +1,9 @@
 package gfx;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 public class LoadSprite {
@@ -23,4 +25,17 @@ public class LoadSprite {
     public static BufferedImage get(BufferedImage image){
         return image;
     }
+
+    public static Font loadFont(String path, float size) {
+        try {
+            // Load font from file
+            Font font = Font.createFont(Font.TRUETYPE_FONT, new File(path));
+            return font.deriveFont(size);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+            // fallback font
+            return new Font("Arial", Font.PLAIN, (int) size);
+        }
+    }
+
 }
