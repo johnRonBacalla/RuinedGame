@@ -1,8 +1,10 @@
 package state;
 
+import data.GameLoader;
 import display.camera.Camera;
 import controller.PlayerController;
 import core.Game;
+import entity.Chest;
 import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
@@ -50,6 +52,24 @@ public class PlayState extends State {
         mm = new MapManager();
         currentMap = mm.getCurrentMap();
         debug = new GridMap(26, 15);
+
+        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
+
+        if (state != null) {
+            System.out.println("Loading Chest ");
+
+            gameObjects.addAll(state.placables);
+
+            for (GameObject obj : state.placables) {
+                if (obj instanceof Chest chest) {
+                    String chestId = chest.getId();
+                    if (state.chestItems.containsKey(chestId)) {
+                        chest.setItems(state.chestItems.get(chestId));
+                        System.out.println("Chest " + chestId + " loaded with items: " + chest.getItems());
+                    }
+                }
+            }
+        }
 
         // Load map objects from CSV
         List<GameObject> mapObjects = SpawnObjects.loadObjects("/mapText/farmObjs.csv", sprites);

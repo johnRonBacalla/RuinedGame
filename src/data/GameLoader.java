@@ -1,0 +1,225 @@
+package data;
+
+import java.util.*;
+import java.util.Map;
+
+import entity.*;
+import gfx.SpriteLibrary;
+import tile.TileScale;
+
+
+public class GameLoader {
+
+
+    public static GameState loadFromSave(String savePath, SpriteLibrary sprites) {
+        java.util.Map<String, Object> saveData = SaveManager.loadGame(savePath);
+
+        if (saveData == null) {
+            System.out.println("Failed to load save file");
+            return null;
+        }
+
+        int wave = (int) saveData.get("wave");
+        @SuppressWarnings("unchecked")
+        java.util.Map<String, List<String>> sections = (java.util.Map<String, List<String>>) saveData.get("sections");
+
+        GameState state = new GameState();
+        state.waveNumber = wave;
+        state.placables = loadPlacables(sections.get("PLACABLES"), sprites);
+        state.towers = loadTowers(sections.get("TOWERS"), sprites);
+        state.seeds = loadSeeds(sections.get("SEEDS"), sprites);
+        state.chestItems = loadChestItems(sections.get("CHEST_ITEMS"));
+        state.playerInventory = loadPlayerInventory(sections.get("PLAYER_INVENTORY"));
+
+        return state;
+    }
+
+    // Load placable objects
+    public static List<GameObject> loadPlacables(List<String> lines, SpriteLibrary sprites) {
+        List<GameObject> objects = new ArrayList<>();
+
+        if (lines == null || lines.isEmpty()) {
+            return objects;
+        }
+
+        // Skip header line (index 0)
+        for (int i = 1; i < lines.size(); i++) {
+            String[] parts = SaveManager.parseLine(lines.get(i));
+            String type = parts[0];
+            int x = Integer.parseInt(parts[1]);
+            int y = Integer.parseInt(parts[2]);
+            String id = parts[3];
+
+            switch (type) {
+                case "house" -> objects.add(new House(TileScale.of(x), TileScale.of(y), sprites));
+                case "tree" -> objects.add(new Tree(TileScale.of(x), TileScale.of(y), sprites));
+                case "chest" -> {
+//                    objects.add(new Chest(TileScale.of(x), TileScale.of(y), sprites, id));
+
+
+                    // Create chest with ID for linking to chest items
+                     GameObject chest = new Chest(TileScale.of(x), TileScale.of(y), sprites, id);
+                     objects.add(chest);
+
+                }
+                default -> System.out.println("Unknown placable type: " + type);
+            }
+        }
+
+        return objects;
+    }
+
+    // Load towers
+    public static List<GameObject> loadTowers(List<String> lines, SpriteLibrary sprites) {
+        List<GameObject> towers = new ArrayList<>();
+
+        if (lines == null || lines.isEmpty()) {
+            return towers;
+        }
+
+        // Skip header line
+        for (int i = 1; i < lines.size(); i++) {
+            String[] parts = SaveManager.parseLine(lines.get(i));
+            String towerType = parts[0];
+            int x = Integer.parseInt(parts[1]);
+            int y = Integer.parseInt(parts[2]);
+            int tier = Integer.parseInt(parts[3]);
+
+            switch (towerType) {
+                case "arrow" -> {
+                    // GameObject tower = new ArrowTower(TileScale.of(x), TileScale.of(y), tier, sprites);
+                    // towers.add(tower);
+                    System.out.println("TODO: Create arrow tower at (" + x + "," + y + ") tier " + tier);
+                }
+                case "cannon" -> {
+                    // GameObject tower = new CannonTower(TileScale.of(x), TileScale.of(y), tier, sprites);
+                    // towers.add(tower);
+                    System.out.println("TODO: Create cannon tower at (" + x + "," + y + ") tier " + tier);
+                }
+                default -> System.out.println("Unknown tower type: " + towerType);
+            }
+        }
+
+        return towers;
+    }
+
+    // Load seeds
+    public static List<GameObject> loadSeeds(List<String> lines, SpriteLibrary sprites) {
+        List<GameObject> seeds = new ArrayList<>();
+
+        if (lines == null || lines.isEmpty()) {
+            return seeds;
+        }
+
+        // Skip header line
+        for (int i = 1; i < lines.size(); i++) {
+            String[] parts = SaveManager.parseLine(lines.get(i));
+            String seedType = parts[0];
+            int x = Integer.parseInt(parts[1]);
+            int y = Integer.parseInt(parts[2]);
+            int stage = Integer.parseInt(parts[3]);
+
+            switch (seedType) {
+                case "wind" -> {
+                    // GameObject seed = new WindSeed(TileScale.of(x), TileScale.of(y), stage, sprites);
+                    // seeds.add(seed);
+                    System.out.println("TODO: Create wind seed at (" + x + "," + y + ") stage " + stage);
+                }
+                case "fire" -> {
+                    // GameObject seed = new FireSeed(TileScale.of(x), TileScale.of(y), stage, sprites);
+                    // seeds.add(seed);
+                    System.out.println("TODO: Create fire seed at (" + x + "," + y + ") stage " + stage);
+                }
+                default -> System.out.println("Unknown seed type: " + seedType);
+            }
+        }
+
+        return seeds;
+    }
+
+    // Load chest items (returns map of chest ID -> list of items)
+    public static java.util.Map<String, List<String>> loadChestItems(List<String> lines) {
+        java.util.Map<String, List<String>> chestItemsMap = new HashMap<>();
+
+        if (lines == null || lines.isEmpty()) {
+            return chestItemsMap;
+        }
+
+        // Skip header line
+        for (int i = 1; i < lines.size(); i++) {
+            String[] parts = SaveManager.parseLine(lines.get(i));
+            String chestId = parts[0];
+
+            // Collect all items (skip the first part which is chest ID)
+            List<String> items = new ArrayList<>();
+            for (int j = 1; j < parts.length; j++) {
+                if (!parts[j].isEmpty()) {
+                    items.add(parts[j]);
+                }
+            }
+
+            chestItemsMap.put(chestId, items);
+        }
+
+        return chestItemsMap;
+    }
+
+    // Load player inventory (returns list of inventory items with positions)
+    public static List<InventoryItem> loadPlayerInventory(List<String> lines) {
+        List<InventoryItem> inventory = new ArrayList<>();
+
+        if (lines == null || lines.isEmpty()) {
+            return inventory;
+        }
+
+        // Skip header line
+        for (int i = 1; i < lines.size(); i++) {
+            String[] parts = SaveManager.parseLine(lines.get(i));
+            String itemType = parts[0];
+            int row = Integer.parseInt(parts[1]);
+            int col = Integer.parseInt(parts[2]);
+
+            inventory.add(new InventoryItem(itemType, row, col));
+        }
+
+        return inventory;
+    }
+
+    // Container for all game data
+    public static class GameState {
+        public int waveNumber;
+        public List<GameObject> placables = new ArrayList<>();
+        public List<GameObject> towers = new ArrayList<>();
+        public List<GameObject> seeds = new ArrayList<>();
+        public Map<String, List<String>> chestItems = new HashMap<>();
+        public List<InventoryItem> playerInventory = new ArrayList<>();
+
+        public void print() {
+            System.out.println("=== GAME STATE ===");
+            System.out.println("Wave: " + waveNumber);
+            System.out.println("Placables: " + placables.size());
+            System.out.println("Towers: " + towers.size());
+            System.out.println("Seeds: " + seeds.size());
+            System.out.println("Chests with items: " + chestItems.size());
+            System.out.println("Inventory items: " + playerInventory.size());
+        }
+    }
+
+    // Inventory Container
+    public static class InventoryItem {
+        public String itemType;
+        public int row;
+        public int col;
+
+        public InventoryItem(String itemType, int row, int col) {
+            this.itemType = itemType;
+            this.row = row;
+            this.col = col;
+        }
+
+        @Override
+        public String toString() {
+            return itemType + " at [" + row + "," + col + "]";
+        }
+    }
+}
