@@ -228,6 +228,10 @@ public class PlayState extends State {
                 mm.changeCurrentObjects(type);
                 reassignAll();
                 break;
+            case FARM:
+                mm.changeCurrentObjects(type);
+                reassignAll();
+                break;
         }
 
         camera = new Camera(

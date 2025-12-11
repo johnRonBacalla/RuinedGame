@@ -53,8 +53,8 @@ public class Player extends MovingEntity {
                     case "toBattle":
                         Display.startFade(() -> {
                             state.changeCurrentMap(Location.BATTLE);
-                            position.setX(TileScale.of(0));
-                            position.setY(TileScale.of(8));
+                            position.setX(TileScale.of(1));
+                            position.setY(TileScale.of(9));
                             restartCamera = true;
                         });
                         break;
@@ -77,16 +77,16 @@ public class Player extends MovingEntity {
                     case "fromBattle":
                         Display.startFade(() -> {
                             state.changeCurrentMap(Location.FARM);
-                            position.setX(TileScale.of(8));
-                            position.setY(TileScale.of(8));
+                            position.setX(TileScale.of(34));
+                            position.setY(TileScale.of(10));
                             restartCamera = true;
                         });
                         break;
                     case "fromMines":
                         Display.startFade(() -> {
                             state.changeCurrentMap(Location.FARM);
-                            position.setX(TileScale.of(3));
-                            position.setY(TileScale.of(3));
+                            position.setX(TileScale.of(21));
+                            position.setY(TileScale.of(4));
                             restartCamera = true;
                         });
                         break;

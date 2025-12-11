@@ -60,7 +60,10 @@ public class MapManager {
         this.savedFileObjects = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
 
         loadFarmAssets();
+        loadMinesAssets();
+        loadBattleAssets();
 
+        // Ari mo load ang gikan sa saved file
         battleObjects.addAll(savedFileObjects.placables);
         minesObjects.addAll(savedFileObjects.placables);
         farmObjects.addAll(savedFileObjects.placables);
@@ -112,6 +115,21 @@ public class MapManager {
         farmObjects.add(minesGate);
         farmObjects.add(beanStalk);
         farmObjects.add(battleGate);
+    }
+
+    private void loadMinesAssets() {
+        Gate fromMineToFarmGate = new Gate(TileScale.of(8), TileScale.of(9), sprites);
+        fromMineToFarmGate.setEvent("fromMines", 0, 5, 1, 1);
+        minesObjects.add(fromMineToFarmGate);
+
+    }
+
+
+    private void loadBattleAssets() {
+        Gate fromBattleToFarmGate = new Gate(TileScale.of(0), TileScale.of(9), sprites);
+        fromBattleToFarmGate.setEvent("fromBattle", 0, 0, 1, 1);
+        battleObjects.add(fromBattleToFarmGate);
+
     }
 
     public void changeMap(Location type) {
