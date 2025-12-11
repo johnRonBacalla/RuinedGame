@@ -21,6 +21,8 @@ public class SpriteLibrary {
         loadSheet("objTree", "/objects/tree.png", 1, 192, 192, 0);
         loadSheet("invisible", "/sprites/invisible.png",1, 64, 64, 0);
         loadSheet("objBridge", "/objects/bridge.png", 1, 264, 132, 0);
+        loadSheet("objMines", "/objects/mines.png", 1, 197, 128, 0);
+        loadSheet("objBean", "/objects/beanStalk.png", 14, 192, 576, 0);
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {
@@ -31,5 +33,15 @@ public class SpriteLibrary {
 
     public BufferedImage[] get(String key) {
         return animations.get(key);
+    }
+
+    public BufferedImage getFrame(String key, int frameIndex) {
+        BufferedImage[] frames = animations.get(key);
+
+        if (frames == null) return null;                   // key not found
+        if (frameIndex < 0 || frameIndex >= frames.length) // out-of-bounds safety
+            return null;
+
+        return frames[frameIndex];
     }
 }

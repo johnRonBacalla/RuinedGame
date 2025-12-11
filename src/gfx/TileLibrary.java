@@ -11,6 +11,7 @@ public class TileLibrary {
     private BufferedImage[] grassDirt;
     private BufferedImage[] dirtGrass;
     private BufferedImage[] wallWater;
+    private BufferedImage[] battle;
 
     public TileLibrary() {
         this.tiles = new ArrayList<>();
@@ -27,6 +28,11 @@ public class TileLibrary {
 
         this.wallWater = CutSprite.cut(LoadSprite.load("/tiles/3wall.png"), 64, 64, 41, 0);
         for(BufferedImage img: wallWater){
+            tiles.add(new Tile(img, false));
+        }
+
+        this.battle = CutSprite.cut(LoadSprite.load("/tiles/4battle.png"), 64, 64, 5, 0);
+        for(BufferedImage img: battle){
             tiles.add(new Tile(img, false));
         }
     }

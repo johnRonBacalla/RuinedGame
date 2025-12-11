@@ -1,5 +1,7 @@
 package core;
 
+import display.Display;
+
 import java.awt.*;
 
 public class GameLoop implements Runnable{
@@ -67,6 +69,7 @@ public class GameLoop implements Runnable{
     }
 
     private void update() {
+        Display.updateFade();
         game.update();
     }
 

@@ -7,7 +7,7 @@ import physics.box.Collision;
 
 public class Tree extends GameObject {
     public Tree(double x, double y, SpriteLibrary sprites) {
-        super(x - 64, y - 128, sprites);
+        super(x - 64, y - 85, sprites);
         this.box = new Collision(this, 55,110, 75,30);
         animations.put("objTree", new Animate(sprites.get("objTree"), 1));
         currentAnimation = animations.get("objTree");

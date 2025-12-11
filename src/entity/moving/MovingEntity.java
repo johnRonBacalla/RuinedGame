@@ -8,6 +8,7 @@ import gfx.SpriteLibrary;
 public class MovingEntity extends GameObject {
 
     protected final Motion motion;
+    public boolean restartCamera;
 
     public MovingEntity(double x, double y, double speed, SpriteLibrary sprites) {
         super(x, y, sprites);

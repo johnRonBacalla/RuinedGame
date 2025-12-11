@@ -59,6 +59,22 @@ public abstract class Map {
         return heightInPx;
     }
 
+    public int getTileWidth() {
+        return tileWidth;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
+
+    public TileLibrary getTileLibrary() {
+        return tl;
+    }
+
+    public int[][] getMapTiles() {
+        return mapTiles;
+    }
+
     public void render(Graphics2D g) {
         for (int row = 0; row < tileHeight; row++) {
             for (int col = 0; col < tileWidth; col++) {

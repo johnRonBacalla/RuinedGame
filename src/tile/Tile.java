@@ -1,5 +1,6 @@
 package tile;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Tile {
@@ -18,5 +19,9 @@ public class Tile {
 
     public boolean isSolid(){
         return solid;
+    }
+
+    public void render(Graphics2D g, int x, int y, int size) {
+        g.drawImage(sprite, x, y, size, size, null);
     }
 }

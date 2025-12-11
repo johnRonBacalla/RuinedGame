@@ -6,9 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import entity.GameObject;
-import entity.stable.House;
-import entity.stable.Invisible;
-import entity.stable.Tree;
+import entity.stable.*;
 import gfx.SpriteLibrary;
 import tile.TileScale;
 
@@ -30,7 +28,8 @@ public class SpawnObjects {
                 switch (id) {
                     case "house" -> objects.add(new House(TileScale.of(x), TileScale.of(y), sprites));
                     case "tree" -> objects.add(new Tree(TileScale.of(x), TileScale.of(y), sprites));
-                    case "invisible" -> objects.add(new Invisible(TileScale.of(x), TileScale.of(x), sprites));
+                    case "bridge" -> objects.add(new Bridge(TileScale.of(x), TileScale.of(y), sprites));
+                    case "gate" -> objects.add(new Mines(TileScale.of(x), TileScale.of(y), sprites));
                 }
             }
         } catch (Exception e) {

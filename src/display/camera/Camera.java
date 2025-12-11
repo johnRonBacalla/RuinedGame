@@ -66,6 +66,14 @@ public class Camera {
         return y;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public void setWorldSize(int widthInPx, int heightInPx) {
         this.worldWidth = widthInPx;
         this.worldHeight = heightInPx;
