@@ -51,13 +51,7 @@ public class GameLoader {
             String id = parts[3];
 
             switch (type) {
-                case "house" -> objects.add(new House(TileScale.of(x), TileScale.of(y), sprites));
-                case "tree" -> objects.add(new Tree(TileScale.of(x), TileScale.of(y), sprites));
                 case "chest" -> {
-//                    objects.add(new Chest(TileScale.of(x), TileScale.of(y), sprites, id));
-
-
-                    // Create chest with ID for linking to chest items
                      GameObject chest = new Chest(TileScale.of(x), TileScale.of(y), sprites, id);
                      objects.add(chest);
 
