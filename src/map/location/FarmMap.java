@@ -5,7 +5,7 @@ import map.Map;
 public class FarmMap extends Map {
 
     public FarmMap(int width, int height){
-        super(26, 15);
+        super(36, 15);
         extractMap("/mapText/farm.txt");
     }
 }

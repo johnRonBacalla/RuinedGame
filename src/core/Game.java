@@ -2,6 +2,7 @@ package core;
 
 import display.Display;
 import input.KeyInput;
+import input.MouseInput;
 import physics.Size;
 import state.PlayState;
 import state.StateManager;
@@ -12,15 +13,17 @@ public class Game {
 
     private Display display;
     private Size windowSize;
-    private KeyInput input;
+    private KeyInput keyInput;
+    private MouseInput mouseInput;
     private StateManager state;
 
     public Game(int width, int height) {
-        input = new KeyInput();
-        display = new Display(width, height, input);
+        keyInput = new KeyInput();
+        mouseInput = new MouseInput();
+        display = new Display(width, height, keyInput, mouseInput);
         windowSize = new Size(width, height);
         state = new StateManager();
-        state.setCurrent(new PlayState(this, input));
+        state.setCurrent(new PlayState(this, keyInput, mouseInput));
     }
 
     public void update() {

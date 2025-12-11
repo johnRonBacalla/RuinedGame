@@ -1,10 +1,15 @@
 package entity.moving;
 
+import display.Display;
+import map.Location;
 import physics.box.Box;
 import gfx.Animate;
 import gfx.SpriteLibrary;
 import physics.box.Sensor;
 import sound.Sound;
+import state.PlayState;
+import state.State;
+import tile.TileScale;
 
 import java.awt.*;
 import java.util.List;
@@ -15,8 +20,11 @@ public class Player extends MovingEntity {
     private Box sensor;
     private Sound walkingSound;
     private boolean wasWalking = false;
+    private Double bridgeBaseY = null;
+    private boolean touchingBridgeThisFrame;
+    private PlayState state;
 
-    public Player(double x, double y, double speed, SpriteLibrary sprites) {
+    public Player(State state, double x, double y, double speed, SpriteLibrary sprites) {
         super(x, y, speed, sprites);
 
         animations.put("idleL", new Animate(sprites.get("playerIdleL"), 12));
@@ -25,14 +33,16 @@ public class Player extends MovingEntity {
         animations.put("walkR", new Animate(sprites.get("playerWalkR"), 12));
         this.currentAnimation = animations.get("idleR");
         this.sensor = new Sensor(this, 16, 42, 32, 25);
-
         this.walkingSound = new Sound("sounds/sfx/WalkingSFX.wav");
+        this.state = (PlayState) state;
     }
 
     public void update(List<Box> boxes){
         super.update();
         handleAnimation();
         handleWalkingSound();
+
+        touchingBridgeThisFrame = false;
 
         for(Box box : boxes) {
             if (sensor.intersects(box)) {
@@ -41,25 +51,84 @@ public class Player extends MovingEntity {
                         sensor.onCollide(box);
                         break;
                     case "toBattle":
-                        System.out.println("Going to BattleField");
+                        Display.startFade(() -> {
+                            state.changeCurrentMap(Location.BATTLE);
+                            position.setX(TileScale.of(0));
+                            position.setY(TileScale.of(8));
+                            restartCamera = true;
+                        });
                         break;
                     case "toMines":
-                        System.out.println("Going to Mines");
+                        Display.startFade(() -> {
+                            state.changeCurrentMap(Location.MINES);
+                            position.setX(TileScale.of(8));
+                            position.setY(TileScale.of(8));
+                            restartCamera = true;
+                        });
                         break;
                     case "toHouse":
-                        System.out.println("Going to House");
+                        Display.startFade(() -> {
+                            state.changeCurrentMap(Location.HOUSE);
+                            position.setX(TileScale.of(8));
+                            position.setY(TileScale.of(8));
+                            restartCamera = true;
+                        });
                         break;
                     case "fromBattle":
-                        System.out.println("Going from BattleField");
+                        Display.startFade(() -> {
+                            state.changeCurrentMap(Location.FARM);
+                            position.setX(TileScale.of(8));
+                            position.setY(TileScale.of(8));
+                            restartCamera = true;
+                        });
                         break;
                     case "fromMines":
-                        System.out.println("Going from Mines");
+                        Display.startFade(() -> {
+                            state.changeCurrentMap(Location.FARM);
+                            position.setX(TileScale.of(3));
+                            position.setY(TileScale.of(3));
+                            restartCamera = true;
+                        });
                         break;
                     case "FromHouse":
-                        System.out.println("Going from House");
+                        Display.startFade(() -> {
+                            state.changeCurrentMap(Location.FARM);
+                            position.setX(TileScale.of(5));
+                            position.setY(TileScale.of(5));
+                            restartCamera = true;
+                        });
+                        break;
+                    case "bridge":
+                        touchingBridgeThisFrame = true;
+                        double fullWidth = 264.0;
+                        double maxLift = 30.0; // example value
+
+                        double dx = this.position.getX() - box.getX();
+                        dx = Math.max(0, Math.min(dx, fullWidth));
+                        double half = fullWidth / 2.0;
+
+                        double lift;
+                        if (dx <= half) {
+                            lift = (dx / half) * maxLift;       // up
+                        } else {
+                            lift = ((fullWidth - dx) / half) * maxLift; // down
+                        }
+
+                        // Store base Y only on FIRST bridge contact
+                        if (bridgeBaseY == null) {
+                            bridgeBaseY = this.getY();  // <-- no teleporting
+                        }
+
+                        // Apply the offset relative to starting Y
+                        this.setY(bridgeBaseY - lift);
+
+                        sensor.onCollide(box);
                         break;
                 }
             }
+        }
+        if (!touchingBridgeThisFrame) {
+            bridgeBaseY = null;
         }
     }
 
@@ -99,5 +168,13 @@ public class Player extends MovingEntity {
         }
 
         wasWalking = isWalking;
+    }
+
+    public double getY() {
+        return position.getY();
+    }
+
+    public void setY(double y){
+        this.position.setY(y);
     }
 }
