@@ -24,6 +24,12 @@ public class SpriteLibrary {
         loadSheet("objMines", "/objects/mines.png", 1, 197, 128, 0);
         loadSheet("objBean", "/objects/beanStalk.png", 14, 192, 576, 0);
         loadSheet("objChestClosed", "/objects/chestClosed.png", 1, 58, 41, 0);
+        loadSheet("objDeadPineTree", "/objects/deadPineTree.png", 1, 72, 129, 0);
+        loadSheet("objPineTree", "/objects/pineTree.png", 1, 108, 178, 0);
+        loadSheet("objStump", "/objects/stump.png", 1, 112, 82, 0);
+        loadSheet("objRockOne", "/objects/rockOne.png", 1, 54, 48, 0);
+        loadSheet("objRockTwo", "/objects/rockTwo.png", 1, 64, 56, 0);
+
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {

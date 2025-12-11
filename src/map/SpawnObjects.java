@@ -30,6 +30,11 @@ public class SpawnObjects {
                     case "tree" -> objects.add(new Tree(TileScale.of(x), TileScale.of(y), sprites));
                     case "bridge" -> objects.add(new Bridge(TileScale.of(x), TileScale.of(y), sprites));
                     case "gate" -> objects.add(new Mines(TileScale.of(x), TileScale.of(y), sprites));
+                    case "deadPineTree" ->  objects.add(new DeadPineTree(TileScale.of(x), TileScale.of(y), sprites));
+                    case "pineTree" ->  objects.add(new PineTree(TileScale.of(x), TileScale.of(y), sprites));
+                    case "stump" ->  objects.add(new Stump(TileScale.of(x), TileScale.of(y), sprites));
+                    case "rockOne" -> objects.add(new RockOne(TileScale.of(x), TileScale.of(y), sprites));
+                    case "rockTwo" -> objects.add(new RockTwo(TileScale.of(x), TileScale.of(y), sprites));
                 }
             }
         } catch (Exception e) {

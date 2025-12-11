@@ -70,32 +70,32 @@ public class PlayState extends State {
         worldBoxes.addAll(currentBox);
         debug = new GridMap(26, 15);
 
-        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
-
-        if (state != null) {
-            System.out.println("Loading Chest ");
-
-            worldObjects.addAll(state.placables);
-
-            for (GameObject obj : state.placables) {
-                if (obj instanceof Chest chest) {
-                    String chestId = chest.getId();
-                    if (state.chestItems.containsKey(chestId)) {
-                        chest.setItems(state.chestItems.get(chestId));
-                        System.out.println("Chest " + chestId + " loaded with items: " + chest.getItems());
-                    }
-                }
-            }
-        }
+//        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
+//
+//        if (state != null) {
+//            System.out.println("Loading Chest ");
+//
+//            worldObjects.addAll(state.placables);
+//
+//            for (GameObject obj : state.placables) {
+//                if (obj instanceof Chest chest) {
+//                    String chestId = chest.getId();
+//                    if (state.chestItems.containsKey(chestId)) {
+//                        chest.setItems(state.chestItems.get(chestId));
+//                        System.out.println("Chest " + chestId + " loaded with items: " + chest.getItems());
+//                    }
+//                }
+//            }
+//        }
 
         // Load map objects from CSV
-        List<GameObject> mapObjects = SpawnObjects.loadObjects("/mapText/farmObjs.csv", sprites);
-        worldObjects.addAll(mapObjects);
+//        List<GameObject> mapObjects = SpawnObjects.loadObjects("/mapText/farmObjs.csv", sprites);
+//        worldObjects.addAll(mapObjects);
 
         // Add their collision boxes to worldBoxes
-        for (GameObject obj : mapObjects) {
-            worldBoxes.add(obj.getBox());
-        }
+//        for (GameObject obj : mapObjects) {
+//            worldBoxes.add(obj.getBox());
+//        }
 
         // Camera setup
         camera = new Camera(

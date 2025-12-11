@@ -1,5 +1,7 @@
 package map;
 
+import data.GameLoader;
+import entity.Chest;
 import entity.GameObject;
 import entity.stable.BeanStalk;
 import entity.stable.Border;
@@ -31,6 +33,10 @@ public class MapManager {
     private List<GameObject> minesObjects;
     private List<GameObject> houseObjects;
 
+    // Save File Data Loader
+    private GameLoader.GameState savedFileObjects;
+
+
     public MapManager(SpriteLibrary sprites) {
         this.sprites = sprites;
 
@@ -49,9 +55,15 @@ public class MapManager {
 
         this.minesObjects = SpawnObjects.loadObjects("/mapText/objects/minesObjs.csv", sprites);
 
-        this.houseObjects = SpawnObjects.loadObjects("/mapText/objects/fhouseObjs.csv", sprites);
+        this.houseObjects = SpawnObjects.loadObjects("/mapText/objects/houseObjs.csv", sprites);
+
+        this.savedFileObjects = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
 
         loadFarmAssets();
+
+        battleObjects.addAll(savedFileObjects.placables);
+        minesObjects.addAll(savedFileObjects.placables);
+        farmObjects.addAll(savedFileObjects.placables);
 
         //initial map
         currentMap = farm;
@@ -145,9 +157,26 @@ public class MapManager {
     public void changeCurrentObjects(Location type) {
         currentMapObjects.clear();
         currentMapBoxes.clear();
+
         switch (type){
             case FARM:
                 currentMapObjects.addAll(farmObjects);
+//                This is for loading the chest items
+//                if (savedFileObjects != null) {
+//                    System.out.println("Loading Chest ");
+//
+//                    currentMapObjects.addAll(savedFileObjects.placables);
+//
+//                    for (GameObject obj : savedFileObjects.placables) {
+//                        if (obj instanceof Chest chest) {
+//                            String chestId = chest.getId();
+//                            if (savedFileObjects.chestItems.containsKey(chestId)) {
+//                                chest.setItems(savedFileObjects.chestItems.get(chestId));
+//                                System.out.println("Chest " + chestId + " loaded with items: " + chest.getItems());
+//                            }
+//                        }
+//                    }
+//                }
                 for (GameObject obj : currentMapObjects) {
                     currentMapBoxes.add(obj.getBox());
                 }
