@@ -1,6 +1,7 @@
 import core.Game;
 import core.GameLoop;
 import data.SaveManager;
+import sound.Sound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,9 @@ import java.util.List;
 public class Launcher {
 
     public static void main(String[] args){
+
+        Sound soundBoardBGM = new Sound("sounds/bgm/StoryBoardBGM.wav");
+        soundBoardBGM.play();
 
         // Initial JFrame size
         // width = 16 * 64 = 1024px
