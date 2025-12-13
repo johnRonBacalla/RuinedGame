@@ -11,11 +11,19 @@ import entity.stable.Chest;
 import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
+import inventory.InventoryManager;
+import inventory.InventoryScale;
 import map.*;
+import physics.Position;
 import physics.box.Box;
 import tile.TileScale;
+import ui.ItemButton;
+import ui.UiButton;
+import ui.UiComponent;
+import ui.UiText;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +46,11 @@ public class PlayState extends State {
     private final List<Box> currentBox;
 
     private boolean inventoryOpen;
+    private List<UiComponent> inventoryView;
 
     private Game game;
+
+    private InventoryManager inventory;
 
     public PlayState(Game game, KeyInput input, MouseInput mouseInput) {
         super(game, input, mouseInput);
@@ -47,6 +58,8 @@ public class PlayState extends State {
         this.game = game;
         controller = new PlayerController(input);
         sprites = new SpriteLibrary();
+        inventory = new InventoryManager(sprites);
+        inventoryView = new ArrayList<>();
 
         worldObjects = new ArrayList<>();
         worldBoxes = new ArrayList<>();
@@ -97,8 +110,7 @@ public class PlayState extends State {
 //        for (GameObject obj : mapObjects) {
 //            worldBoxes.add(obj.getBox());
 //        }
-
-
+        initializeInventory();
 
         // Camera setup
         camera = new Camera(
@@ -109,6 +121,111 @@ public class PlayState extends State {
         );
 
         inventoryOpen = false;
+        inventory.printInventory();
+    }
+
+    private void initializeInventory() {
+        UiButton item1 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(1),
+                        InventoryScale.of(2)), 1, () -> {
+            System.out.println(inventory.getItemName(1));
+        });
+
+        UiButton item2 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(2),
+                        InventoryScale.of(2)), 2, () -> {
+            System.out.println(inventory.getItemName(2));
+        });
+        UiButton item3 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(3),
+                        InventoryScale.of(2)), 3, () -> {
+            System.out.println(inventory.getItemName(3));
+        });
+        UiButton item4 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(4),
+                        InventoryScale.of(2)), 4, () -> {
+            System.out.println(inventory.getItemName(4));
+        });
+
+        UiButton item5 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(1),
+                        InventoryScale.of(3)), 5, () -> {
+            System.out.println(inventory.getItemName(5));
+        });
+        UiButton item6 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(2),
+                        InventoryScale.of(3)), 6, () -> {
+            System.out.println(inventory.getItemName(6));
+        });
+        UiButton item7 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(3),
+                        InventoryScale.of(3)), 7, () -> {
+            System.out.println(inventory.getItemName(7));
+        });
+        UiButton item8 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(4),
+                        InventoryScale.of(3)), 8, () -> {
+            System.out.println(inventory.getItemName(8));
+        });
+
+        UiButton item9 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(1),
+                        InventoryScale.of(4)), 9, () -> {
+            System.out.println(inventory.getItemName(9));
+        });
+        UiButton item10 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(2),
+                        InventoryScale.of(4)), 10, () -> {
+            System.out.println(inventory.getItemName(10));
+        });
+        UiButton item11 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(3),
+                        InventoryScale.of(4)), 11, () -> {
+            System.out.println(inventory.getItemName(11));
+        });
+        UiButton item12 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(4),
+                        InventoryScale.of(4)), 12, () -> {
+            System.out.println(inventory.getItemName(12));
+        });
+
+        UiButton item13 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(1),
+                        InventoryScale.of(5)), 13, () -> {
+            System.out.println(inventory.getItemName(13));
+        });
+        UiButton item14 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(2),
+                        InventoryScale.of(5)), 14, () -> {
+            System.out.println(inventory.getItemName(14));
+        });
+        UiButton item15 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(3),
+                        InventoryScale.of(5)), 15, () -> {
+            System.out.println(inventory.getItemName(15));
+        });
+        UiButton item16 = new ItemButton(sprites, inventory,
+                new Position(InventoryScale.of(4),
+                        InventoryScale.of(5)), 16, () -> {
+            System.out.println(inventory.getItemName(16));
+        });
+
+        inventoryView.add(item1);
+        inventoryView.add(item2);
+        inventoryView.add(item3);
+        inventoryView.add(item4);
+        inventoryView.add(item5);
+        inventoryView.add(item6);
+        inventoryView.add(item7);
+        inventoryView.add(item8);
+        inventoryView.add(item9);
+        inventoryView.add(item10);
+        inventoryView.add(item11);
+        inventoryView.add(item12);
+        inventoryView.add(item13);
+        inventoryView.add(item14);
+        inventoryView.add(item15);
+        inventoryView.add(item16);
     }
 
     public void placeChest(int tileX, int tileY) {
@@ -151,13 +268,31 @@ public class PlayState extends State {
         if (!controller.isRequestingPlaceItem()) {
             lastPlacePressed = false;
         }
+        if (input.isPressed(KeyEvent.VK_E)) {
+            inventoryOpen = !inventoryOpen;
+        }
 
-        if (!inventoryOpen) {
-            player.getMotion().update(controller);
-            player.applyMotion();
-            for (GameObject obj : worldObjects) {
-                if (obj instanceof Player p) p.update(worldBoxes);
-                else obj.update();
+        player.getMotion().update(controller);
+        player.applyMotion();
+        for (GameObject obj : worldObjects) {
+            if (obj instanceof Player p) p.update(worldBoxes);
+            else obj.update();
+        }
+
+        if (inventoryOpen) {
+            for (UiComponent component : inventoryView) {
+
+                // Call default update first (safe for all)
+                component.update();
+
+                // Only buttons receive mouse input
+                if (component instanceof UiButton button) {
+                    button.update(
+                            mouseInput.mouseX,
+                            mouseInput.mouseY,
+                            mouseInput.isLeftPressed()
+                    );
+                }
             }
         }
 
