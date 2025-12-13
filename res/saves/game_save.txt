@@ -1,2 +1,7 @@
-WAVE:2
+WAVE:1
+
+[PLACABLES]
+entity_type,x,y,location
+chest,15,8,FARM
+chest,18,8,FARM
 

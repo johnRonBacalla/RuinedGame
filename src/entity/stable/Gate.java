@@ -25,4 +25,14 @@ public class Gate extends GameObject {
                 TileScale.of(width),
                 TileScale.of(height));
     }
+
+    public void saveGame(String signal, int offsetX, int offSetY, int width, int height){
+        this.box = new Event(
+                this,
+                signal,
+                offsetX,
+                offSetY,
+                TileScale.of(width),
+                TileScale.of(height));
+    }
 }

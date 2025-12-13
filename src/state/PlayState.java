@@ -7,6 +7,7 @@ import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
 import entity.stable.Bridge;
+import entity.stable.Chest;
 import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
@@ -97,6 +98,8 @@ public class PlayState extends State {
 //            worldBoxes.add(obj.getBox());
 //        }
 
+
+
         // Camera setup
         camera = new Camera(
                 game.getWindowSize().getWidth(),
@@ -108,8 +111,46 @@ public class PlayState extends State {
         inventoryOpen = false;
     }
 
+    public void placeChest(int tileX, int tileY) {
+        Chest chest = new Chest(TileScale.of(tileX), TileScale.of(tileY), sprites);
+
+        // Add to MapManager (persists across map changes)
+        mm.addObject(mm.getCurrentLocation(), chest);
+
+        currentObject.add(chest);
+        worldObjects.add(chest);
+
+        currentBox.add(chest.getBox());
+        worldBoxes.add(chest.getBox());
+
+        System.out.println("Placed chest at (" + tileX + ", " + tileY + ")");
+
+    }
+
+    public void saveGame() {
+        mm.saveAllObjects(1); // Pass wave number
+        System.out.println("Game saved!");
+    }
+
+    public MapManager getMapManager() {
+        return mm;
+    }
+    private boolean lastPlacePressed = false;
+
     @Override
     public void update() {
+        if (controller.isRequestingPlaceItem() && !lastPlacePressed) {
+            int playerTileX = TileScale.in(player.getPosition().getX());
+            int playerTileY = TileScale.in(player.getPosition().getY());
+            placeChest(playerTileX, playerTileY);
+            lastPlacePressed = true;
+
+
+        }
+
+        if (!controller.isRequestingPlaceItem()) {
+            lastPlacePressed = false;
+        }
 
         if (!inventoryOpen) {
             player.getMotion().update(controller);

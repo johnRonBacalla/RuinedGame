@@ -26,7 +26,7 @@ public class GameLoader {
 
         GameState state = new GameState();
         state.waveNumber = wave;
-        state.placables = loadPlacables(sections.get("PLACABLES"), sprites);
+        state.sections = sections;
         state.towers = loadTowers(sections.get("TOWERS"), sprites);
         state.seeds = loadSeeds(sections.get("SEEDS"), sprites);
         state.chestItems = loadChestItems(sections.get("CHEST_ITEMS"));
@@ -36,32 +36,35 @@ public class GameLoader {
     }
 
     // Load placable objects
-    public static List<GameObject> loadPlacables(List<String> lines, SpriteLibrary sprites) {
-        List<GameObject> objects = new ArrayList<>();
+    // Change this method to organize by location
+    public static Map<String, List<GameObject>> loadPlacablesByLocation(List<String> lines, SpriteLibrary sprites) {
+        Map<String, List<GameObject>> objectsByLocation = new HashMap<>();
+        objectsByLocation.put("FARM", new ArrayList<>());
+        objectsByLocation.put("BATTLE", new ArrayList<>());
+        objectsByLocation.put("MINES", new ArrayList<>());
+        objectsByLocation.put("HOUSE", new ArrayList<>());
 
         if (lines == null || lines.isEmpty()) {
-            return objects;
+            return objectsByLocation;
         }
 
-        // Skip header line (index 0)
         for (int i = 1; i < lines.size(); i++) {
             String[] parts = SaveManager.parseLine(lines.get(i));
             String type = parts[0];
             int x = Integer.parseInt(parts[1]);
             int y = Integer.parseInt(parts[2]);
-            String id = parts[3];
+            String location = parts[3];
 
             switch (type) {
                 case "chest" -> {
-                     GameObject chest = new Chest(TileScale.of(x), TileScale.of(y), sprites, id);
-                     objects.add(chest);
-
+                    GameObject chest = new Chest(TileScale.of(x), TileScale.of(y), sprites);
+                    objectsByLocation.get(location).add(chest);
                 }
                 default -> System.out.println("Unknown placable type: " + type);
             }
         }
 
-        return objects;
+        return objectsByLocation;
     }
 
     // Load towers
@@ -183,6 +186,7 @@ public class GameLoader {
     // Container for all game data
     public static class GameState {
         public int waveNumber;
+        public Map<String, List<String>> sections;
         public List<GameObject> placables = new ArrayList<>();
         public List<GameObject> towers = new ArrayList<>();
         public List<GameObject> seeds = new ArrayList<>();
@@ -197,6 +201,10 @@ public class GameLoader {
             System.out.println("Seeds: " + seeds.size());
             System.out.println("Chests with items: " + chestItems.size());
             System.out.println("Inventory items: " + playerInventory.size());
+        }
+
+        public void addTower(String type, Integer x, Integer y ) {
+
         }
     }
 

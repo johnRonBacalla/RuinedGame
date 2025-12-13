@@ -1,5 +1,6 @@
 package entity.moving;
 
+import data.SaveManager;
 import display.Display;
 import map.Location;
 import physics.box.Box;
@@ -12,7 +13,10 @@ import state.State;
 import tile.TileScale;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Player extends MovingEntity {
 
@@ -22,7 +26,9 @@ public class Player extends MovingEntity {
     private boolean wasWalking = false;
     private Double bridgeBaseY = null;
     private boolean touchingBridgeThisFrame;
+    private boolean touchingSaveBoxThisFrame;
     private PlayState state;
+    private boolean hasSavedThisEntry = false;
 
     public Player(State state, double x, double y, double speed, SpriteLibrary sprites) {
         super(x, y, speed, sprites);
@@ -43,6 +49,7 @@ public class Player extends MovingEntity {
         handleWalkingSound();
 
         touchingBridgeThisFrame = false;
+        touchingSaveBoxThisFrame = false;
 
         for(Box box : boxes) {
             if (sensor.intersects(box)) {
@@ -124,11 +131,28 @@ public class Player extends MovingEntity {
 
                         sensor.onCollide(box);
                         break;
+                    case "saveGame":
+                        touchingSaveBoxThisFrame = true;
+
+                        // Only save if we haven't saved during this entry
+                        if (!hasSavedThisEntry) {
+                            hasSavedThisEntry = true;  // Mark as saved
+
+                            Display.startFade(() -> {
+                                state.saveGame();
+                                restartCamera = true;
+                            });
+                        }
+                        break;
                 }
             }
         }
         if (!touchingBridgeThisFrame) {
             bridgeBaseY = null;
+        }
+
+        if (!touchingSaveBoxThisFrame) {
+            hasSavedThisEntry = false;
         }
     }
 

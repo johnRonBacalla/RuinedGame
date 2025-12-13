@@ -1,6 +1,7 @@
 package physics;
 
 import controller.Controller;
+import state.PlayState;
 
 public class Motion {
 
@@ -11,6 +12,7 @@ public class Motion {
     private double deceleration = 0.45;
     private double velocityX = 0;
     private double velocityY = 0;
+    private PlayState state;
 
     public Motion(double speed) {
         this.speed = speed;

@@ -1,10 +1,9 @@
 package map;
 
 import data.GameLoader;
+import data.SaveManager;
 import entity.GameObject;
-import entity.stable.BeanStalk;
-import entity.stable.Border;
-import entity.stable.Gate;
+import entity.stable.*;
 import gfx.SpriteLibrary;
 import map.location.BattleMap;
 import map.location.FHouseMap;
@@ -16,6 +15,7 @@ import tile.TileScale;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MapManager {
@@ -24,6 +24,7 @@ public class MapManager {
     private SpriteLibrary sprites;
 
     private Map currentMap;
+    private Location currentLocation;
     private List<GameObject> currentMapObjects;
     private List<Box> currentMapBoxes;
 
@@ -64,14 +65,21 @@ public class MapManager {
         loadHouseAssets();
 
         // Ari mo load ang gikan sa saved file
-        battleObjects.addAll(savedFileObjects.placables);
-        minesObjects.addAll(savedFileObjects.placables);
-        farmObjects.addAll(savedFileObjects.placables);
-        houseObjects.addAll(savedFileObjects.placables);
+
+        if(savedFileObjects != null){
+            java.util.Map<String, List<GameObject>> loadedObjects =
+                    GameLoader.loadPlacablesByLocation(savedFileObjects.sections.get("PLACABLES"), sprites);
+
+            farmObjects.addAll(loadedObjects.get("FARM"));
+            battleObjects.addAll(loadedObjects.get("BATTLE"));
+            minesObjects.addAll(loadedObjects.get("MINES"));
+            houseObjects.addAll(loadedObjects.get("HOUSE"));
+        }
 
 
         //initial map
         currentMap = farm;
+        currentLocation = Location.FARM;
         currentMapObjects.addAll(farmObjects);
 
         for (GameObject obj : currentMapObjects) {
@@ -139,12 +147,94 @@ public class MapManager {
     }
 
     private void loadHouseAssets() {
-        Gate fromHouseToFarm = new Gate(TileScale.of(8), TileScale.of(9), sprites);
-        fromHouseToFarm.setEvent("fromHouse", 0, 5, 1, 1);
+
+
+        Border topBorder =  new Border(TileScale.of(4), TileScale.of(2), sprites);
+        topBorder.setCollision(0, -25, 30, 1);
+
+        Border leftBorder = new Border(TileScale.of(1), TileScale.of(0), sprites);
+        leftBorder.setCollision(0, 0, 3, 15);
+
+        Border rightBorder = new Border(TileScale.of(36), TileScale.of(0), sprites);
+        rightBorder.setCollision(0, 0, 1, 15);
+
+        Border bottomBorder = new Border(TileScale.of(0), TileScale.of(15), sprites);
+        bottomBorder.setCollision(0, 0, 36, 1);
+
+        Gate fromHouseToFarm = new Gate(TileScale.of(7), TileScale.of(9), sprites);
+        fromHouseToFarm.setEvent("fromHouse", 0, 5, 2, 1);
         houseObjects.add(fromHouseToFarm);
+
+        Gate save = new Gate(TileScale.of(6), TileScale.of(3), sprites);
+        save.setEvent("saveGame", 0, 5, 2, 2);
+        houseObjects.add(save);
+
+        Bed playerBed = new Bed(TileScale.of(10), TileScale.of(3), sprites);
+        houseObjects.add(playerBed);
+
+        Bed emberBed = new Bed(TileScale.of(6), TileScale.of(3), sprites);
+        houseObjects.add(emberBed);
+
+
+
+        houseObjects.add(topBorder);
+        houseObjects.add(leftBorder);
+        houseObjects.add(rightBorder);
+        houseObjects.add(bottomBorder);
+
+
+
+    }
+
+    public void addObject(Location location, GameObject obj) {
+        switch (location) {
+            case FARM -> farmObjects.add(obj);
+            case BATTLE -> battleObjects.add(obj);
+            case MINES -> minesObjects.add(obj);
+            case HOUSE -> houseObjects.add(obj);
+        }
+
+        if (location == currentLocation) {
+            currentMapObjects.add(obj);
+            currentMapBoxes.add(obj.getBox());
+        }
+    }
+
+    public void saveAllObjects(int waveNumber) {
+        java.util.Map<String, List<String>> gameData = new HashMap<>();
+        List<String> placables = new ArrayList<>();
+
+        // CSV Header
+        placables.add("entity_type,x,y,location");
+
+        // Save objects from all locations
+        addObjectsToSave(placables, farmObjects, Location.FARM);
+        addObjectsToSave(placables, battleObjects, Location.BATTLE);
+        addObjectsToSave(placables, minesObjects, Location.MINES);
+        addObjectsToSave(placables, houseObjects, Location.HOUSE);
+
+        gameData.put("PLACABLES", placables);
+        SaveManager.saveGame(waveNumber, gameData);
+
+        System.out.println("Saved " + (placables.size() - 1) + " objects across all locations");
+    }
+
+    private void addObjectsToSave(List<String> placables, List<GameObject> objects, Location location) {
+        for (GameObject obj : objects) {
+            if (obj instanceof Chest) {
+                Chest chest = (Chest) obj;
+                int tileX = TileScale.in(chest.getPosition().getX());
+                int tileY = TileScale.in(chest.getPosition().getY());
+
+                placables.add(String.format("chest,%d,%d,%s",
+                        tileX, tileY, location.name()));
+            }
+            // TODO: Add more object types here (Beds, Towers, Seeds, etc.)
+        }
     }
 
     public void changeMap(Location type) {
+        currentLocation = type;
         switch(type) {
             case BATTLE -> currentMap = battle;
             case FARM   -> currentMap = farm;
@@ -182,6 +272,10 @@ public class MapManager {
 
     public List<Box> getCurrentMapBoxes(){
         return currentMapBoxes;
+    }
+
+    public Location getCurrentLocation(){
+        return currentLocation;
     }
 
     public void changeCurrentObjects(Location type) {

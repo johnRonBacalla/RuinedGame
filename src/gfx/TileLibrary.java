@@ -13,6 +13,7 @@ public class TileLibrary {
     private BufferedImage[] wallWater;
     private BufferedImage[] battle;
     private BufferedImage[] house;
+    private BufferedImage[] mines;
 
     public TileLibrary() {
         this.tiles = new ArrayList<>();
@@ -37,8 +38,13 @@ public class TileLibrary {
             tiles.add(new Tile(img, false));
         }
 
-        this.house = CutSprite.cut(LoadSprite.load("/tiles/houseTiles.png"), 64, 64, 16, 0);
+        this.house = CutSprite.cut(LoadSprite.load("/tiles/houseTiles.png"), 64, 64, 20, 0);
         for(BufferedImage img: house){
+            tiles.add(new Tile(img, false));
+        }
+
+        this.mines = CutSprite.cut(LoadSprite.load("/tiles/5mines.png"), 64, 64, 6, 0);
+        for(BufferedImage img: mines){
             tiles.add(new Tile(img, false));
         }
     }

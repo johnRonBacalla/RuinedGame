@@ -35,7 +35,7 @@ public class SpriteLibrary {
         loadSheet("objStump", "/objects/stump.png", 1, 112, 82, 0);
         loadSheet("objRockOne", "/objects/rockOne.png", 1, 54, 48, 0);
         loadSheet("objRockTwo", "/objects/rockTwo.png", 1, 64, 56, 0);
-
+        loadSheet("objBed", "/objects/bed.png", 1, 96, 128, 0);
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {
