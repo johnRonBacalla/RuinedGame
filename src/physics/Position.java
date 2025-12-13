@@ -1,10 +1,11 @@
 package physics;
 
+import tile.TileScale;
+
 public class Position {
 
     private double x;
     private double y;
-    private double prevX, prevY;
 
     public Position(double x, double y) {
         this.x = x;
@@ -18,6 +19,15 @@ public class Position {
     public int intY(){
         return Math.round((float) y);
     }
+
+    public int tileX(){
+        return (int) Math.round(x / 64);
+    }
+
+    public int tileY(){
+        return (int) Math.round(y / 64);
+    }
+
 
     public double getX() {
         return x;

@@ -15,11 +15,31 @@ public class LoadSprite {
             if (stream == null)
                 throw new IllegalArgumentException("Resource not found at: " + path);
 
-            return ImageIO.read(stream);
+            BufferedImage img = ImageIO.read(stream);
+            return toCompatibleImage(img); // <--- IMPORTANT
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to read image: " + path, e);
         }
+    }
+
+    public static BufferedImage toCompatibleImage(BufferedImage image) {
+        GraphicsConfiguration gc = GraphicsEnvironment
+                .getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice()
+                .getDefaultConfiguration();
+
+        BufferedImage compatible = gc.createCompatibleImage(
+                image.getWidth(),
+                image.getHeight(),
+                image.getTransparency()
+        );
+
+        Graphics2D g2d = compatible.createGraphics();
+        g2d.drawImage(image, 0, 0, null);
+        g2d.dispose();
+
+        return compatible;
     }
 
     public static BufferedImage get(BufferedImage image){
@@ -28,14 +48,11 @@ public class LoadSprite {
 
     public static Font loadFont(String path, float size) {
         try {
-            // Load font from file
             Font font = Font.createFont(Font.TRUETYPE_FONT, new File(path));
             return font.deriveFont(size);
-        } catch (FontFormatException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            // fallback font
             return new Font("Arial", Font.PLAIN, (int) size);
         }
     }
-
 }
