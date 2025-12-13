@@ -3,7 +3,6 @@ package display;
 import input.KeyInput;
 import input.MouseInput;
 import state.State;
-import ui.UI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +16,6 @@ public class Display extends JFrame {
     private static boolean fadeIn = true;         // true = fade-in, false = fade-out
     private static Runnable onFadeComplete;       // callback for map change
     private static final float fadeSpeed = 0.05f; // tweak to control fade speed
-    private UI ui;
 
     public Display(int width, int height, KeyInput keyInput, MouseInput mouseInput) {
         setTitle(" ");
@@ -32,8 +30,6 @@ public class Display extends JFrame {
         canvas.addKeyListener(keyInput);
         canvas.addMouseListener(mouseInput);
         canvas.addMouseMotionListener(mouseInput);
-
-        this.ui = new UI(keyInput, mouseInput);
 
         pack();
         setLocationRelativeTo(null);

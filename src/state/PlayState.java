@@ -11,15 +11,10 @@ import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
 import map.*;
-import physics.Size;
 import physics.box.Box;
 import tile.TileScale;
-import ui.*;
-import ui.buttons.ButtonUI;
-import ui.buttons.InventoryUI;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +30,6 @@ public class PlayState extends State {
 
     private Camera camera;
 
-    private final UI playUi;
-    private final ButtonUI hotBar;
-    private final InventoryUI inventory;
-
     private final List<GameObject> worldObjects;
     private final List<GameObject> currentObject;
 
@@ -53,7 +44,6 @@ public class PlayState extends State {
         super(game, input, mouseInput);
 
         this.game = game;
-        playUi = new PlayUI(input, mouseInput);
         controller = new PlayerController(input);
         sprites = new SpriteLibrary();
 
@@ -66,12 +56,6 @@ public class PlayState extends State {
         // Player always separate first
         player = new Player(this, TileScale.of(15), TileScale.of(8), 5, sprites);
         worldObjects.add(player);
-
-        hotBar = new ButtonUI(sprites.getFrame("uiHotBar", 0), new Size(296, 560, 432, 48), () -> {
-            System.out.println("clicked");
-        });
-
-        inventory = new InventoryUI(input, mouseInput);
 
         // Map Manager + debug map
         mm = new MapManager(sprites);
@@ -94,53 +78,21 @@ public class PlayState extends State {
         );
 
         inventoryOpen = false;
-        initializeUI();
-    }
-
-    private void initializeUI() {
-        UIContainer container = new UIContainer();
-        container.setMargin(new Spacing(10));
-        container.setPadding(12);
-        container.setSize(new Size(5, 5));
-        uiContainers.add(container);
-
-        UIText text = new UIText("123456789");
-        container.add((text));
     }
 
     @Override
     public void update() {
 
-        uiContainers.forEach(uiContainer -> uiContainer.update());
-        if(input.isPressed(KeyEvent.VK_E)){
-            inventoryOpen = !inventoryOpen;
-            System.out.println("Inventory toggled");
-        }
-
-        if(!inventoryOpen){
-            // Update player input & motion
+        if (!inventoryOpen) {
             player.getMotion().update(controller);
             player.applyMotion();
-
-            // Update all objects
             for (GameObject obj : worldObjects) {
-                if (obj instanceof Player p) {
-                    p.update(worldBoxes); // player checks collisions
-                } else {
-                    obj.update(); // other objects normally
-                }
+                if (obj instanceof Player p) p.update(worldBoxes);
+                else obj.update();
             }
         }
 
-        // Maintain draw order
         sortObjectsByPosition();
-
-        playUi.update();
-        hotBar.update(mouseInput);
-        if(inventoryOpen){
-            inventory.update(mouseInput);
-        }
-        // Camera follows player
         camera.update(player);
     }
 
@@ -212,17 +164,7 @@ public class PlayState extends State {
 
         camera.reset(g);
 
-        uiContainers.forEach(uiContainer -> g.drawImage(
-                uiContainer.getSprite(),
-                uiContainer.getPosition().intX(),
-                uiContainer.getPosition().intY(),
-                null
-        ));
-
-        playUi.render(g);
-        hotBar.render(g);
         if(inventoryOpen){
-            inventory.render(g);
         }
     }
 

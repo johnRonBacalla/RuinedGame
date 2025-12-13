@@ -27,7 +27,8 @@ public class SpriteLibrary {
         loadSheet("objMines", "/objects/mines.png", 1, 197, 128, 0);
         loadSheet("objBean", "/objects/beanStalk.png", 14, 192, 576, 0);
 
-        loadSheet("uiHotBar", "/assets/hotBar.png", 1, 432, 48, 0);
+        loadSheet("itemFrame", "/assets/itemFrame.png", 1, 76, 76, 0);
+        loadSheet("itemHighlight", "/assets/itemHighlight.png", 1, 76, 76, 0);
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {
