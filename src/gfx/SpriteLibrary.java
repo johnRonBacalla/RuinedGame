@@ -16,13 +16,19 @@ public class SpriteLibrary {
         loadSheet("playerIdleR", "/sprites/player/stand.png", 9, 64, 64, 0);
         loadSheet("playerWalkL", "/sprites/player/walk.png", 9, 64, 64, 1);
         loadSheet("playerWalkR", "/sprites/player/walk.png", 9, 64, 64, 0);
+
+        loadSheet("invisible", "/sprites/invisible.png",1, 64, 64, 0);
+
         loadSheet("emberIdleL", "/sprites/npc/ember.png", 9, 64, 64, 1);
+
         loadSheet("objHouse", "/objects/house.png", 1, 186, 212, 0);
         loadSheet("objTree", "/objects/tree.png", 1, 192, 192, 0);
         loadSheet("invisible", "/sprites/invisible.png",1, 64, 64, 0);
         loadSheet("objBridge", "/objects/bridge.png", 1, 264, 132, 0);
         loadSheet("objMines", "/objects/mines.png", 1, 197, 128, 0);
         loadSheet("objBean", "/objects/beanStalk.png", 14, 192, 576, 0);
+
+        loadSheet("uiHotBar", "/assets/hotBar.png", 1, 432, 48, 0);
         loadSheet("objChestClosed", "/objects/chestClosed.png", 1, 58, 41, 0);
         loadSheet("objDeadPineTree", "/objects/deadPineTree.png", 1, 72, 129, 0);
         loadSheet("objPineTree", "/objects/pineTree.png", 1, 108, 178, 0);
