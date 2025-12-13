@@ -26,9 +26,6 @@ public class SpriteLibrary {
         loadSheet("objBridge", "/objects/bridge.png", 1, 264, 132, 0);
         loadSheet("objMines", "/objects/mines.png", 1, 197, 128, 0);
         loadSheet("objBean", "/objects/beanStalk.png", 14, 192, 576, 0);
-        loadSheet("itemFrame", "/assets/itemFrame.png", 1, 76, 76, 0);
-        loadSheet("itemHighlight", "/assets/itemHighlight.png", 1, 76, 76, 0);
-        loadSheet("uiHotBar", "/assets/hotBar.png", 1, 432, 48, 0);
         loadSheet("objChestClosed", "/objects/chestClosed.png", 1, 58, 41, 0);
         loadSheet("objDeadPineTree", "/objects/deadPineTree.png", 1, 72, 129, 0);
         loadSheet("objPineTree", "/objects/pineTree.png", 1, 108, 178, 0);
@@ -36,6 +33,15 @@ public class SpriteLibrary {
         loadSheet("objRockOne", "/objects/rockOne.png", 1, 54, 48, 0);
         loadSheet("objRockTwo", "/objects/rockTwo.png", 1, 64, 56, 0);
 
+        loadSheet("itemButton", "/assets/itemButton.png", 2, 76, 76, 0);
+        loadSheet("longButton", "/assets/longButton.png", 2, 288, 86, 0);
+        loadSheet("midButton", "/assets/midButton.png", 2, 164, 86, 0);
+        loadSheet("shortButton", "/assets/shortButton.png", 2, 90, 86, 0);
+
+        loadSheet("giantButton", "/assets/giantButton.png", 2, 576, 172, 0);
+        loadSheet("logo", "/assets/logo.png", 1, 690, 214, 0);
+
+        loadSheet("catalog", "/assets/catalog.png", 16, 64, 64, 0);
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {
