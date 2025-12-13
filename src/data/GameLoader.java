@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.Map;
 
 import entity.*;
+import entity.stable.Chest;
 import gfx.SpriteLibrary;
 import tile.TileScale;
 

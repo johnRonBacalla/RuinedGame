@@ -1,6 +1,2 @@
 WAVE:2
 
-[PLACABLES]
-entity_type,x,y,id
-chest,10,7,2
-

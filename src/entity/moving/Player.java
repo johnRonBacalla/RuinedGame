@@ -90,11 +90,11 @@ public class Player extends MovingEntity {
                             restartCamera = true;
                         });
                         break;
-                    case "FromHouse":
+                    case "fromHouse":
                         Display.startFade(() -> {
                             state.changeCurrentMap(Location.FARM);
-                            position.setX(TileScale.of(5));
-                            position.setY(TileScale.of(5));
+                            position.setX(TileScale.of(15));
+                            position.setY(TileScale.of(6));
                             restartCamera = true;
                         });
                         break;

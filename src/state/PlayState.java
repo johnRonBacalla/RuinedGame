@@ -1,10 +1,8 @@
 package state;
 
-import data.GameLoader;
 import display.camera.Camera;
 import controller.PlayerController;
 import core.Game;
-import entity.Chest;
 import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
@@ -229,6 +227,10 @@ public class PlayState extends State {
                 reassignAll();
                 break;
             case FARM:
+                mm.changeCurrentObjects(type);
+                reassignAll();
+                break;
+            case HOUSE:
                 mm.changeCurrentObjects(type);
                 reassignAll();
                 break;

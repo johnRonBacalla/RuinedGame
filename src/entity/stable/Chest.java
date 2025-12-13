@@ -1,8 +1,8 @@
-package entity;
+package entity.stable;
 
+import entity.GameObject;
 import gfx.Animate;
 import gfx.SpriteLibrary;
-import physics.box.Collision;
 
 import java.util.ArrayList;
 import java.util.List;

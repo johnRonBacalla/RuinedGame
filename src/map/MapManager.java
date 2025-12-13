@@ -1,7 +1,6 @@
 package map;
 
 import data.GameLoader;
-import entity.Chest;
 import entity.GameObject;
 import entity.stable.BeanStalk;
 import entity.stable.Border;
@@ -62,11 +61,14 @@ public class MapManager {
         loadFarmAssets();
         loadMinesAssets();
         loadBattleAssets();
+        loadHouseAssets();
 
         // Ari mo load ang gikan sa saved file
         battleObjects.addAll(savedFileObjects.placables);
         minesObjects.addAll(savedFileObjects.placables);
         farmObjects.addAll(savedFileObjects.placables);
+        houseObjects.addAll(savedFileObjects.placables);
+
 
         //initial map
         currentMap = farm;
@@ -103,6 +105,9 @@ public class MapManager {
         Gate battleGate = new Gate(TileScale.of(36), TileScale.of(10), sprites);
         battleGate.setEvent("toBattle", -1, 0, 32, 64);
 
+        Gate houseGate = new Gate(TileScale.of(15), TileScale.of(5), sprites);
+        houseGate.setEvent("toHouse", 0, 15, 1, 1);
+
         BeanStalk beanStalk = new BeanStalk(TileScale.of(4), TileScale.of(-1), sprites);
         beanStalk.setCollision(0, TileScale.of(6), 3, 3);
 
@@ -115,6 +120,7 @@ public class MapManager {
         farmObjects.add(minesGate);
         farmObjects.add(beanStalk);
         farmObjects.add(battleGate);
+        farmObjects.add(houseGate);
     }
 
     private void loadMinesAssets() {
@@ -130,6 +136,12 @@ public class MapManager {
         fromBattleToFarmGate.setEvent("fromBattle", 0, 0, 1, 1);
         battleObjects.add(fromBattleToFarmGate);
 
+    }
+
+    private void loadHouseAssets() {
+        Gate fromHouseToFarm = new Gate(TileScale.of(8), TileScale.of(9), sprites);
+        fromHouseToFarm.setEvent("fromHouse", 0, 5, 1, 1);
+        houseObjects.add(fromHouseToFarm);
     }
 
     public void changeMap(Location type) {
