@@ -16,7 +16,7 @@ public class ItemButton extends UiButton{
         this.image = spriteLibrary.getFrame("itemButton", 0);
         this.hoveredImage = spriteLibrary.getFrame("itemButton", 1);
         this.currentImage = image;
-        this.inventory = inventory;wdd
+        this.inventory = inventory;
         this.itemImage = inventory.getItemImage(itemId);
         this.itemId = itemId;
 
