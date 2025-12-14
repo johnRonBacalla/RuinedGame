@@ -17,12 +17,9 @@ public class BeanStalk extends GameObject {
         animations.put("objBean", beanAnim);
 
         // Show only frame 0 (or any frame you want)
-        beanAnim.showOnly(sprites.get("objBean"), 14);
-        beanAnim.lock();
 
         // Set this as the current animation
         currentAnimation = beanAnim;
-
     }
 
     public void setCollision(int offsetX, int offSetY, int width, int height){

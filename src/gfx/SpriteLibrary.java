@@ -33,7 +33,7 @@ public class SpriteLibrary {
         loadSheet("objRockOne", "/objects/rockOne.png", 1, 54, 48, 0);
         loadSheet("objRockTwo", "/objects/rockTwo.png", 1, 64, 56, 0);
 
-        loadSheet("itemButton", "/assets/itemButton.png", 2, 76, 76, 0);
+        loadSheet("itemButton", "/assets/itemButton.png", 3, 76, 76, 0);
         loadSheet("longButton", "/assets/longButton.png", 2, 288, 86, 0);
         loadSheet("midButton", "/assets/midButton.png", 2, 164, 86, 0);
         loadSheet("shortButton", "/assets/shortButton.png", 2, 90, 86, 0);
@@ -42,6 +42,13 @@ public class SpriteLibrary {
         loadSheet("logo", "/assets/logo.png", 1, 690, 214, 0);
 
         loadSheet("catalog", "/assets/catalog.png", 16, 64, 64, 0);
+
+        loadSheet("swordIdle", "/weapons/rightSword.png", 9, 192, 192, 0);
+        loadSheet("swordAttack", "/weapons/rightSword.png", 9, 192, 192, 1);
+        loadSheet("hammerIdle", "/weapons/rightHammer.png", 9, 192, 192, 0);
+        loadSheet("hammerAttack", "/weapons/rightHammer.png", 9, 192, 192, 1);
+        loadSheet("spearIdle", "/weapons/rightSpear.png", 9, 192, 192, 0);
+        loadSheet("spearAttack", "/weapons/rightSpear.png", 9, 192, 192, 1);
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {

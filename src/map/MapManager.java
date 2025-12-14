@@ -1,15 +1,18 @@
 package map;
 
 import data.GameLoader;
+import display.camera.Camera;
 import entity.GameObject;
 import entity.stable.BeanStalk;
 import entity.stable.Border;
 import entity.stable.Gate;
 import gfx.SpriteLibrary;
+import input.MouseInput;
 import map.location.BattleMap;
 import map.location.FHouseMap;
 import map.location.FarmMap;
 import map.location.MinesMap;
+import physics.Position;
 import physics.box.Box;
 import tile.Tile;
 import tile.TileScale;
@@ -130,7 +133,6 @@ public class MapManager {
 
     }
 
-
     private void loadBattleAssets() {
         Gate fromBattleToFarmGate = new Gate(TileScale.of(0), TileScale.of(9), sprites);
         fromBattleToFarmGate.setEvent("fromBattle", 0, 0, 1, 1);
@@ -151,6 +153,13 @@ public class MapManager {
             case MINES  -> currentMap = mines;
             case HOUSE  -> currentMap = house;
         }
+    }
+
+    public Point getMouseTile(MouseInput mouse, Camera camera){
+        int worldX = mouse.getMouseX() + (int) camera.getX();
+        int worldY = mouse.getMouseY() + (int) camera.getY();
+
+        return new Point(worldX / 64, worldY / 64);
     }
 
     public Map getCurrentMap() {

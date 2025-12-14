@@ -12,6 +12,7 @@ import input.KeyInput;
 import input.MouseInput;
 import inventory.InventoryManager;
 import inventory.InventoryScale;
+import inventory.WeaponItem;
 import map.*;
 import physics.Position;
 import physics.box.Box;
@@ -46,10 +47,13 @@ public class PlayState extends State {
 
     private boolean inventoryOpen;
     private List<UiComponent> inventoryView;
+    private InventoryManager inventory;
+
+    private List<UiComponent> hud;
+    private Point mouseInMap;
+    private UiText mouseTile;
 
     private Game game;
-
-    private InventoryManager inventory;
 
     public PlayState(Game game, KeyInput input, MouseInput mouseInput) {
         super(game, input, mouseInput);
@@ -57,8 +61,8 @@ public class PlayState extends State {
         this.game = game;
         controller = new PlayerController(input);
         sprites = new SpriteLibrary();
-        inventory = new InventoryManager(sprites);
         inventoryView = new ArrayList<>();
+        hud = new ArrayList<>();
 
         worldObjects = new ArrayList<>();
         worldBoxes = new ArrayList<>();
@@ -69,6 +73,7 @@ public class PlayState extends State {
         // Player always separate first
         player = new Player(this, TileScale.of(15), TileScale.of(8), 5, sprites);
         worldObjects.add(player);
+        inventory = new InventoryManager(sprites, player);
 
         // Map Manager + debug map
         mm = new MapManager(sprites);
@@ -110,6 +115,7 @@ public class PlayState extends State {
 //            worldBoxes.add(obj.getBox());
 //        }
         initializeInventory();
+        initializeHud();
 
         // Camera setup
         camera = new Camera(
@@ -119,94 +125,149 @@ public class PlayState extends State {
                 currentMap.getHeightInPx()
         );
 
+        mouseInMap = mm.getMouseTile(mouseInput, camera);
+
         inventoryOpen = false;
         inventory.printInventory();
+    }
+
+    private void initializeHud() {
+        mouseTile = new UiText("test", new Position(100, 100), 36, false);
+        hud.add(mouseTile);
     }
 
     private void initializeInventory() {
         UiButton item1 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(2)), 1, () -> {
-            System.out.println(inventory.getItemName(1));
+            if(inventory.getItemStack(1).getQuantity() != 0){
+                System.out.println(inventory.getItemName(1));
+                handleItemEquip(1);
+            }
         });
 
         UiButton item2 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(2)), 2, () -> {
-            System.out.println(inventory.getItemName(2));
+            if(inventory.getItemStack(2).getQuantity() != 0){
+                System.out.println(inventory.getItemName(2));
+                handleItemEquip(2);
+            }
         });
         UiButton item3 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(2)), 3, () -> {
-            System.out.println(inventory.getItemName(3));
+            if(inventory.getItemStack(3).getQuantity() != 0){
+                System.out.println(inventory.getItemName(3));
+                handleItemEquip(3);
+            }
         });
         UiButton item4 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(2)), 4, () -> {
-            System.out.println(inventory.getItemName(4));
+            if(inventory.getItemStack(4).getQuantity() != 0){
+                System.out.println(inventory.getItemName(4));
+                handleItemEquip(4);
+            }
         });
 
         UiButton item5 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(3)), 5, () -> {
-            System.out.println(inventory.getItemName(5));
+            if(inventory.getItemStack(5).getQuantity() != 0){
+                System.out.println(inventory.getItemName(5));
+                handleItemEquip(5);
+            }
         });
         UiButton item6 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(3)), 6, () -> {
-            System.out.println(inventory.getItemName(6));
+            if(inventory.getItemStack(6).getQuantity() != 0){
+                System.out.println(inventory.getItemName(6));
+                handleItemEquip(6);
+            }
         });
         UiButton item7 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(3)), 7, () -> {
-            System.out.println(inventory.getItemName(7));
+            if(inventory.getItemStack(7).getQuantity() != 0){
+                System.out.println(inventory.getItemName(7));
+                handleItemEquip(7);
+            }
         });
         UiButton item8 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(3)), 8, () -> {
-            System.out.println(inventory.getItemName(8));
+            if(inventory.getItemStack(8).getQuantity() != 0){
+                System.out.println(inventory.getItemName(8));
+                handleItemEquip(8);
+            }
         });
 
         UiButton item9 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(4)), 9, () -> {
-            System.out.println(inventory.getItemName(9));
+            if(inventory.getItemStack(9).getQuantity() != 0){
+                System.out.println(inventory.getItemName(9));
+                handleItemEquip(9);
+            }
         });
         UiButton item10 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(4)), 10, () -> {
-            System.out.println(inventory.getItemName(10));
+            if(inventory.getItemStack(10).getQuantity() != 0){
+                System.out.println(inventory.getItemName(10));
+                handleItemEquip(10);
+            }
         });
         UiButton item11 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(4)), 11, () -> {
-            System.out.println(inventory.getItemName(11));
+            if(inventory.getItemStack(11).getQuantity() != 0){
+                System.out.println(inventory.getItemName(11));
+                handleItemEquip(11);
+            }
         });
         UiButton item12 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(4)), 12, () -> {
-            System.out.println(inventory.getItemName(12));
+            if(inventory.getItemStack(12).getQuantity() != 0){
+                System.out.println(inventory.getItemName(12));
+                handleItemEquip(12);
+            }
         });
 
         UiButton item13 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(5)), 13, () -> {
-            System.out.println(inventory.getItemName(13));
+            if(inventory.getItemStack(13).getQuantity() != 0){
+                System.out.println(inventory.getItemName(13));
+                handleItemEquip(13);
+            }
         });
         UiButton item14 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(5)), 14, () -> {
-            System.out.println(inventory.getItemName(14));
+            if(inventory.getItemStack(14).getQuantity() != 0){
+                System.out.println(inventory.getItemName(14));
+                handleItemEquip(14);
+            }
         });
         UiButton item15 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(5)), 15, () -> {
-            System.out.println(inventory.getItemName(15));
+            if(inventory.getItemStack(15).getQuantity() != 0){
+                System.out.println(inventory.getItemName(15));
+                handleItemEquip(15);
+            }
         });
         UiButton item16 = new ItemButton(sprites, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(5)), 16, () -> {
-            System.out.println(inventory.getItemName(16));
+            if(inventory.getItemStack(16).getQuantity() != 0){
+                System.out.println(inventory.getItemName(16));
+                handleItemEquip(16);
+            }
         });
 
         inventoryView.add(item1);
@@ -227,14 +288,31 @@ public class PlayState extends State {
         inventoryView.add(item16);
     }
 
+    public void handleItemEquip(int itemId){
+        if(inventory.getEquippedItem() != inventory.getItem(itemId)){
+            inventory.setEquippedItem(itemId);
+        } else inventory.removeEquippedItem();
+    }
+
     @Override
     public void update() {
         if (input.isPressed(KeyEvent.VK_E)) {
             inventoryOpen = !inventoryOpen;
         }
 
+        // Handle weapon attacks with SPACE BAR
+        if (!inventoryOpen && input.isPressed(KeyEvent.VK_SPACE)) {
+            if (inventory.getEquippedItem() instanceof WeaponItem) {
+                WeaponItem weapon = (WeaponItem) inventory.getEquippedItem();
+                weapon.attack();
+            }
+        }
+
+        mouseTile.setText(String.valueOf(mm.getMouseTile(mouseInput, camera)));
+
         player.getMotion().update(controller);
         player.applyMotion();
+
         for (GameObject obj : worldObjects) {
             if (obj instanceof Player p) p.update(worldBoxes);
             else obj.update();
@@ -242,19 +320,23 @@ public class PlayState extends State {
 
         if (inventoryOpen) {
             for (UiComponent component : inventoryView) {
-
-                // Call default update first (safe for all)
                 component.update();
-
-                // Only buttons receive mouse input
                 if (component instanceof UiButton button) {
                     button.update(
-                            mouseInput.mouseX,
-                            mouseInput.mouseY,
+                            mouseInput.getMouseX(),
+                            mouseInput.getMouseY(),
                             mouseInput.isLeftPressed()
                     );
                 }
             }
+        }
+
+        for(UiComponent component: hud){
+            component.update();
+        }
+
+        if(inventory.getEquippedItem() != null){
+            inventory.getEquippedItem().update();
         }
 
         sortObjectsByPosition();
@@ -291,7 +373,6 @@ public class PlayState extends State {
         );
 
         mm.render(g, view);
-
         debug.render(g);
 
         for (GameObject obj : worldObjects) {
@@ -304,6 +385,13 @@ public class PlayState extends State {
 
             if (view.intersects(objRect)) {
                 obj.render(g);
+
+                // Render weapon ON TOP of player when equipped
+                if (obj instanceof Player) {
+                    if (inventory.getEquippedItem() instanceof WeaponItem) {
+                        ((WeaponItem) inventory.getEquippedItem()).render(g);
+                    }
+                }
             }
         }
 
@@ -322,6 +410,7 @@ public class PlayState extends State {
                     case "col" -> g.setColor(Color.RED);
                     case "sensor" -> g.setColor(Color.YELLOW);
                     case "event" -> g.setColor(Color.ORANGE);
+                    case "hit" -> g.setColor(Color.GREEN);
                 }
                 obj.renderBox(g);
             }
@@ -329,11 +418,14 @@ public class PlayState extends State {
 
         camera.reset(g);
 
-
         if(inventoryOpen){
             for(UiComponent components: inventoryView){
                 components.render(g);
             }
+        }
+
+        for(UiComponent component: hud){
+            component.render(g);
         }
     }
 

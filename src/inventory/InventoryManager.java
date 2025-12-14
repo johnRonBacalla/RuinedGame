@@ -1,6 +1,8 @@
 package inventory;
 
+import entity.moving.MovingEntity;
 import gfx.SpriteLibrary;
+import weapon.WeaponData;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -13,11 +15,13 @@ public class InventoryManager {
     private final Map<Integer, ItemStack> inventory; // itemId -> ItemStack
     private final Map<Integer, Item> itemCatalog;   // itemId -> Item object
     private Item equippedItem;
+    private MovingEntity owner;
 
-    public InventoryManager(SpriteLibrary spriteLibrary) {
+    public InventoryManager(SpriteLibrary spriteLibrary, MovingEntity player) {
         inventory = new HashMap<>();
         itemCatalog = new HashMap<>();
         this.spriteLibrary = spriteLibrary;
+        owner = player;
         loadItems();
         initializeInventory();
     }
@@ -29,6 +33,11 @@ public class InventoryManager {
         BufferedImage spearIcon = spriteLibrary.getFrame("catalog", 1);
         BufferedImage hammerIcon = spriteLibrary.getFrame("catalog", 2);
         BufferedImage shovelIcon = spriteLibrary.getFrame("catalog", 3);
+
+        WeaponData swordData = new WeaponData(1, "Sword", spriteLibrary);
+        WeaponData spearData = new WeaponData(2, "Spear", spriteLibrary);
+        WeaponData hammerData = new WeaponData(3, "Hammer", spriteLibrary);
+        WeaponData shovelData = new WeaponData(4, "Shovel", spriteLibrary);
 
         //potions
         BufferedImage healthPotIcon = spriteLibrary.getFrame("catalog", 4);
@@ -46,10 +55,10 @@ public class InventoryManager {
         BufferedImage earthIIRuneIcon = spriteLibrary.getFrame("catalog", 14);
         BufferedImage windIIRuneIcon = spriteLibrary.getFrame("catalog", 15);
 
-        itemCatalog.put(1, new WeaponItem(1, "Sword", swordIcon));
-        itemCatalog.put(2, new WeaponItem(2, "Spear", spearIcon));
-        itemCatalog.put(3, new WeaponItem(3, "Hammer", hammerIcon));
-        itemCatalog.put(4, new WeaponItem(4, "Shovel", shovelIcon));
+        itemCatalog.put(1, new WeaponItem(1, "Sword", swordIcon, swordData));
+        itemCatalog.put(2, new WeaponItem(2, "Spear", spearIcon, spearData));
+        itemCatalog.put(3, new WeaponItem(3, "Hammer", hammerIcon, hammerData));
+        itemCatalog.put(4, new WeaponItem(4, "Shovel", shovelIcon, shovelData));
 
         itemCatalog.put(5, new PotionItem(5, "Health Potion", healthPotIcon));
         itemCatalog.put(6, new PotionItem(6, "Rock Potion", rockPotIcon));
@@ -70,8 +79,16 @@ public class InventoryManager {
     // Start inventory with all items but 0 quantity
     private void initializeInventory() {
         for (int itemId : itemCatalog.keySet()) {
-            inventory.put(itemId, new ItemStack(itemCatalog.get(itemId), 64));
+            inventory.put(itemId, new ItemStack(itemCatalog.get(itemId), 0));
         }
+        give(1, 1);
+        give(2, 1);
+        give(3, 1);
+        give(4, 1);
+        give(9, 2);
+        give(10, 2);
+        give(11, 2);
+        give(12, 2);
     }
 
     public void give(int itemId, int quantity) {
@@ -80,22 +97,6 @@ public class InventoryManager {
 
         int newQty = Math.min(stack.getQuantity() + quantity, 64);
         stack.setQuantity(newQty);
-    }
-
-    public void clickingButton(int itemId) {
-        ItemStack stack = inventory.get(itemId);
-        if (stack == null || stack.getQuantity() <= 0) return;
-
-        Item item = stack.getItem();
-
-        if (item instanceof PotionItem) {
-            // Signal PlayState to apply potion effect
-            // some callback to PlayState
-            stack.decrement(1);    // reduce quantity
-        } else {
-            equippedItem = item;
-            item.onEquip();
-        }
     }
 
     public void printInventory() {
@@ -109,8 +110,25 @@ public class InventoryManager {
         System.out.println("------------------");
     }
 
+    public void setEquippedItem(int itemId){
+        equippedItem = itemCatalog.get(itemId);
+
+        // If it's a weapon, set the owner so it can render
+        if (equippedItem instanceof WeaponItem weapon) {
+            weapon.setOwner(owner);
+        }
+    }
+
+    public void removeEquippedItem(){
+        equippedItem = null;
+    }
+
     public ItemStack getItemStack(int itemId) {
         return inventory.get(itemId);
+    }
+
+    public Item getItem(int itemId){
+        return itemCatalog.get(itemId);
     }
 
     public Item getEquippedItem() {

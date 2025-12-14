@@ -5,23 +5,35 @@ import inventory.InventoryManager;
 import physics.Position;
 import physics.Size;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class ItemButton extends UiButton{
 
     public InventoryManager inventory;
     public int itemId;
+    public BufferedImage equipedImage;
 
     public ItemButton(SpriteLibrary spriteLibrary, InventoryManager inventory, Position position,int itemId, Runnable onClick) {
         super(position, new Size(76, 76), onClick);
         this.image = spriteLibrary.getFrame("itemButton", 0);
         this.hoveredImage = spriteLibrary.getFrame("itemButton", 1);
+        this.equipedImage = spriteLibrary.getFrame("itemButton", 2);
         this.currentImage = image;
-        this.inventory = inventory;wdd
+        this.inventory = inventory;
         this.itemImage = inventory.getItemImage(itemId);
         this.itemId = itemId;
 
-        this.buttonText = new UiText("x", new Position(this.getPosition().getX() + 49, this.getPosition().getY() + 50), 15, false);
+        this.buttonText = new UiText("x", new Position(this.getPosition().getX() + 44, this.getPosition().getY() + 49), 15, false);
         buttonText.setText(String.valueOf(inventory.getItemStack(itemId).getQuantity()));
+    }
+
+    @Override
+    public void update(int mouseX, int mouseY, boolean mousePressed) {
+        super.update(mouseX, mouseY, mousePressed);
+
+        if(inventory.getEquippedItem() == inventory.getItem(itemId)){
+            currentImage = equipedImage;
+        }
     }
 
     @Override
@@ -53,11 +65,11 @@ public class ItemButton extends UiButton{
         // Draw button text on top
         if (buttonText != null && !(inventory.getItemStack(itemId).getQuantity() <= 1)) {
 
-            g.setColor(Color.darkGray);
-            g.fillRect(getPosition().intX() + 48,
-                    getPosition().intY() + 55,
-                    getSize().getWidth() - 50,
-                    getSize().getHeight() - 55
+            g.setColor(new Color(68, 44, 23));
+            g.fillRect(getPosition().intX() + 42,
+                    getPosition().intY() + 57,
+                    getSize().getWidth() - 48,
+                    getSize().getHeight() - 62
             );
 
             buttonText.render(g);

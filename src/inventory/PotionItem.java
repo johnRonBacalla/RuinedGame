@@ -1,5 +1,6 @@
 package inventory;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class PotionItem extends Item{
@@ -8,8 +9,12 @@ public class PotionItem extends Item{
     }
 
     @Override
-    public void onUse() {
-        // Just a signal; actual effect happens in PlayState
-        System.out.println("Potion used: " + name);
+    public void update() {
+
+    }
+
+    @Override
+    public void render(Graphics2D g) {
+
     }
 }
