@@ -120,7 +120,7 @@ public class PlayState extends State {
                 currentMap.getHeightInPx()
         );
 
-        inventoryOpen = false;
+        inventoryOpen = true;
         inventory.printInventory();
     }
 
