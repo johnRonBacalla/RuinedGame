@@ -6,20 +6,20 @@ import gfx.SpriteLibrary;
 import physics.box.Collision;
 import tile.TileScale;
 
-public class Chest extends GameObject {
-    public Chest(double x, double y, SpriteLibrary sprites) {
+public class Bed extends GameObject {
+    public Bed(double x, double y, SpriteLibrary sprites) {
         super(x, y, sprites);
 
-        Animate chest = new Animate(sprites.get("objChestClosed"), 1);
+        // Load the full animation (14 frames)
+        Animate bed = new Animate(sprites.get("objBed"), 1);
 
         // Store it in GameObject's animation map
-        animations.put("objChestClosed", chest);
+        animations.put("objBed", bed);
 
 
 
         // Set this as the current animation
-        currentAnimation = chest;
+        currentAnimation = bed;
 
     }
-
 }

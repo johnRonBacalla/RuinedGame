@@ -6,4 +6,6 @@ public interface Controller {
     boolean isRequestingDown();
     boolean isRequestingLeft();
     boolean isRequestingRight();
+
+    boolean isRequestingPlaceItem();
 }

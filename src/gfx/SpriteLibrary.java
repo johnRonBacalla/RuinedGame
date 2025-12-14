@@ -32,6 +32,7 @@ public class SpriteLibrary {
         loadSheet("objStump", "/objects/stump.png", 1, 112, 82, 0);
         loadSheet("objRockOne", "/objects/rockOne.png", 1, 54, 48, 0);
         loadSheet("objRockTwo", "/objects/rockTwo.png", 1, 64, 56, 0);
+        loadSheet("objBed", "/objects/bed.png", 1, 96, 128, 0);
 
         loadSheet("itemButton", "/assets/itemButton.png", 3, 76, 76, 0);
         loadSheet("longButton", "/assets/longButton.png", 2, 288, 86, 0);

@@ -30,4 +30,9 @@ public class PlayerController implements Controller {
     public boolean isRequestingRight() {
         return input.isCurrentlyPressed(KeyEvent.VK_D);
     }
+
+
+    public boolean isRequestingPlaceItem() {
+        return input.isCurrentlyPressed(KeyEvent.VK_P);
+    }
 }
