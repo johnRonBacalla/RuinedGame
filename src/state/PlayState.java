@@ -466,6 +466,22 @@ public class PlayState extends State {
 
         // ===== TOWER UPDATES =====
         // Update all towers with their specific behaviors
+        List<Box> allActiveWallBoxes = new ArrayList<>();
+        for (GameObject obj : worldObjects) {
+            if (obj instanceof EarthTower1) {
+                EarthTower1 earthTower = (EarthTower1) obj;
+                for (EarthTower1.Wall wall : earthTower.getActiveWalls()) {
+                    allActiveWallBoxes.add(wall.getCollisionBox());
+                }
+            }
+        }
+
+// Remove wall boxes that are NO LONGER in any active wall list
+        worldBoxes.removeIf(box ->
+                box.getSignal().equals("wall") && !allActiveWallBoxes.contains(box)
+        );
+
+// Second pass: Update all towers with their specific behaviors
         for (GameObject obj : worldObjects) {
             if (obj instanceof Tower) {
                 Tower tower = (Tower) obj;
@@ -489,14 +505,11 @@ public class PlayState extends State {
                     windTower.updateSupport(worldObjects);
                 }
 
-                // Earth Tower (Wall) - Add walls to collision and update wall damage
+                // Earth Tower (Wall) - Add active wall collision boxes
                 if (tower instanceof EarthTower1) {
                     EarthTower1 earthTower = (EarthTower1) tower;
 
-                    // Update walls with enemy detection for damage-over-time
-                    earthTower.updateWithEnemies(worldObjects);
-
-                    // Add wall collision boxes to worldBoxes so enemies collide with them
+                    // Add collision boxes for all active walls (if not already present)
                     for (EarthTower1.Wall wall : earthTower.getActiveWalls()) {
                         if (!worldBoxes.contains(wall.getCollisionBox())) {
                             worldBoxes.add(wall.getCollisionBox());

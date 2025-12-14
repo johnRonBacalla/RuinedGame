@@ -54,9 +54,15 @@ public class EarthTower1 extends Tower {
         update(); // Call regular update first
 
         // Pass worldObjects to each wall so they can check for stuck enemies
+        List<Wall> toRemove = new ArrayList<>();
         for (Wall wall : activeWalls) {
-            wall.updateWithEnemies(worldObjects);
+            wall.update();
+            if (wall.isBroken()) {
+                toRemove.add(wall);
+            }
         }
+        activeWalls.removeAll(toRemove);
+
     }
 
     @Override
@@ -96,14 +102,12 @@ public class EarthTower1 extends Tower {
      * Extends GameObject so it can use the Collision box system
      */
     public static class Wall extends GameObject {
-        private int maxHp;
-        private int currentHp;
         private boolean broken;
 
-        // Damage over time
-        private int damagePerSecond = 10;
-        private double damageTimer = 0;
-        private static final double DAMAGE_INTERVAL = 1.0; // 1 second
+        // Time-based system instead of HP
+        private double lifetime; // How long the wall lasts (seconds)
+        private double timer; // Current time alive (seconds)
+        private static final double DEFAULT_LIFETIME = 5.0; // 5 seconds default
 
         private static final int WALL_WIDTH = TileScale.of(1);
         private static final int WALL_HEIGHT = TileScale.of(1);
@@ -111,8 +115,8 @@ public class EarthTower1 extends Tower {
         public Wall(double x, double y, SpriteLibrary sprites) {
             super(x, y, sprites);
 
-            this.maxHp = 100; // Default HP - can be changed
-            this.currentHp = maxHp;
+            this.lifetime = DEFAULT_LIFETIME;
+            this.timer = 0;
             this.broken = false;
 
             // Use custom Collision box that returns "wall" signal
@@ -131,68 +135,13 @@ public class EarthTower1 extends Tower {
         public void update() {
             // Don't call super.update() since we don't have animations
 
-            // Check if wall is broken
-            if (currentHp <= 0 && !broken) {
+            // Increment timer (assuming 60 FPS)
+            timer += 1.0 / 60.0;
+
+            // Check if wall lifetime expired
+            if (timer >= lifetime && !broken) {
                 broken = true;
-            }
-        }
-
-        /**
-         * Update wall with list of all enemies to check for stuck enemies
-         * Call this from EarthTower1.update()
-         */
-        public void updateWithEnemies(List<GameObject> allObjects) {
-            if (broken) return;
-
-            // Check how many enemies are stuck to this wall
-            int enemiesStuck = 0;
-            for (GameObject obj : allObjects) {
-                if (obj instanceof MovingEntity && !(obj instanceof Player)) {
-                    MovingEntity enemy = (MovingEntity) obj;
-
-                    // Check if enemy is touching this wall
-                    if (isEnemyTouchingWall(enemy)) {
-                        enemiesStuck++;
-                    }
-                }
-            }
-
-            // Apply damage over time if enemies are stuck
-            if (enemiesStuck > 0) {
-                damageTimer += 1.0 / 60.0; // deltaTime (assuming 60 FPS)
-
-                if (damageTimer >= DAMAGE_INTERVAL) {
-                    // Each enemy does damage per second
-                    int totalDamage = damagePerSecond * enemiesStuck;
-                    takeDamage(totalDamage);
-                    damageTimer = 0;
-
-                    System.out.println("Wall taking " + totalDamage +
-                            " damage from " + enemiesStuck + " enemies! HP: " +
-                            currentHp + "/" + maxHp);
-                }
-            } else {
-                // Reset timer if no enemies are stuck
-                damageTimer = 0;
-            }
-        }
-
-        /**
-         * Check if an enemy is touching this wall
-         */
-        private boolean isEnemyTouchingWall(MovingEntity enemy) {
-            // Get enemy's sensor box (assuming they have one)
-            Box enemyBox = enemy.getBox();
-            if (enemyBox == null) return false;
-
-            // Check intersection with wall's collision box
-            return box.intersects(enemyBox);
-        }
-
-        public void takeDamage(int damage) {
-            if (!broken) {
-                currentHp -= damage;
-                if (currentHp < 0) currentHp = 0;
+                System.out.println("Wall expired after " + lifetime + " seconds!");
             }
         }
 
@@ -230,24 +179,27 @@ public class EarthTower1 extends Tower {
                 );
             }
 
-            // Draw HP bar above wall
-            renderHpBar(g);
+            // Draw timer bar above wall (shows remaining time)
+            renderTimerBar(g);
         }
 
-        private void renderHpBar(Graphics2D g) {
+        /**
+         * Render timer bar showing remaining wall lifetime
+         */
+        private void renderTimerBar(Graphics2D g) {
             int barWidth = WALL_WIDTH;
             int barHeight = 4;
             int barX = (int) position.getX();
             int barY = (int) position.getY() - 8;
 
-            // Background (red)
-            g.setColor(Color.RED);
+            // Background (dark gray)
+            g.setColor(Color.DARK_GRAY);
             g.fillRect(barX, barY, barWidth, barHeight);
 
-            // Foreground (green) based on HP percentage
-            double hpPercent = (double) currentHp / maxHp;
-            g.setColor(Color.GREEN);
-            g.fillRect(barX, barY, (int)(barWidth * hpPercent), barHeight);
+            // Foreground (cyan) based on time remaining
+            double timePercent = 1.0 - (timer / lifetime);
+            g.setColor(Color.CYAN);
+            g.fillRect(barX, barY, (int)(barWidth * timePercent), barHeight);
 
             // Border
             g.setColor(Color.BLACK);
@@ -257,23 +209,12 @@ public class EarthTower1 extends Tower {
         // Getters
         public Box getCollisionBox() { return box; }
         public boolean isBroken() { return broken; }
-        public int getCurrentHp() { return currentHp; }
-        public int getMaxHp() { return maxHp; }
+        public double getLifetime() { return lifetime; }
+        public double getTimeRemaining() { return Math.max(0, lifetime - timer); }
 
         // Setters
-        public void setMaxHp(int maxHp) {
-            this.maxHp = maxHp;
-            this.currentHp = maxHp;
-        }
-
-        public void setCurrentHp(int hp) {
-            this.currentHp = hp;
-            if (this.currentHp > maxHp) this.currentHp = maxHp;
-            if (this.currentHp < 0) this.currentHp = 0;
-        }
-
-        public void setDamagePerSecond(int dps) {
-            this.damagePerSecond = dps;
+        public void setLifetime(double seconds) {
+            this.lifetime = seconds;
         }
     }
 }
