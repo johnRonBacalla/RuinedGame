@@ -1,6 +1,7 @@
 package map;
 
 import entity.GameObject;
+import entity.moving.Skele;
 import entity.placeable.EarthPlant;
 import entity.placeable.FirePlant;
 import entity.placeable.IcePlant;
@@ -67,7 +68,7 @@ public class PlacementManager {
 
     // PLANTS
     public GameObject placeFirePlant(int tileX, int tileY, Map currentMap, Location currentLocation) {
-        return placeObject(new FirePlant(TileScale.of(tileX), TileScale.of(tileY), spriteLibrary),
+        return placeObject(new Skele(TileScale.of(tileX), TileScale.of(tileY), spriteLibrary),
                 tileX, tileY, currentMap, currentLocation);
     }
 

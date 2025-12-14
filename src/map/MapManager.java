@@ -107,8 +107,8 @@ public class MapManager {
         Border topRiver = new Border(TileScale.of(29), TileScale.of(4), sprites);
         topRiver.setCollision(0, -48, 4, 6);
 
-        Border bottomRiver = new Border(TileScale.of(29), TileScale.of(13), sprites);
-        bottomRiver.setCollision(0, 16, 4, 4);
+        Border bottomRiver = new Border(TileScale.of(29), TileScale.of(11), sprites);
+        bottomRiver.setCollision(0, 16, 4, 6);
 
         Gate minesGate = new Gate(TileScale.of(21), TileScale.of(3), sprites);
         minesGate.setEvent("toMines", 0, -15, 1, 1);

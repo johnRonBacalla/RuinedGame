@@ -30,6 +30,11 @@ public class WeaponItem extends Item {
 
     private boolean debugHitbox = true; // Toggle to show/hide hitbox
 
+    // NEW: Hitbox activation delay
+    private int hitboxActivationDelay = 10; // frames to wait before hitbox activates (adjustable)
+    private int hitboxDelayTimer = 0;
+    private boolean waitingToActivateHitbox = false;
+
     public WeaponItem(int id, String name, BufferedImage icon, WeaponData weaponData) {
         super(id, name, icon);
         this.weaponData = weaponData;
@@ -75,6 +80,20 @@ public class WeaponItem extends Item {
     public void update() {
         if (cooldownTimer > 0) {
             cooldownTimer--;
+        }
+
+        // NEW: Handle hitbox activation delay
+        if (waitingToActivateHitbox) {
+            hitboxDelayTimer--;
+            if (hitboxDelayTimer <= 0) {
+                // Time to activate the hitbox!
+                if (hitBox != null) {
+                    hitBox.activate(weaponData.getAttackDuration());
+                    updateHitboxOffset();
+                    System.out.println("Hitbox activated after delay!");
+                }
+                waitingToActivateHitbox = false;
+            }
         }
 
         // Update current animation
@@ -146,6 +165,12 @@ public class WeaponItem extends Item {
         g.setColor(Color.WHITE);
         g.drawString("WEAPON: " + (facingLeft ? "LEFT" : "RIGHT"), weaponX - 128, weaponY - 10);
 
+        // NEW: Show delay timer
+        if (waitingToActivateHitbox) {
+            g.setColor(Color.YELLOW);
+            g.drawString("Delay: " + hitboxDelayTimer, weaponX - 128, weaponY - 25);
+        }
+
         // Render debug hitbox
         if (debugHitbox && hitBox != null && hitBox.isActive()) {
             renderDebugHitbox(g);
@@ -199,11 +224,10 @@ public class WeaponItem extends Item {
         currentAnimation = weaponData.getAttackAnimation();
         currentAnimation.reset();
 
-        // Activate hitbox
-        if (hitBox != null) {
-            hitBox.activate(weaponData.getAttackDuration());
-            updateHitboxOffset(); // Set correct offset based on facing direction
-        }
+        // NEW: Start the delay timer instead of activating immediately
+        waitingToActivateHitbox = true;
+        hitboxDelayTimer = hitboxActivationDelay;
+        System.out.println("Hitbox will activate in " + hitboxActivationDelay + " frames");
 
         cooldownTimer = weaponData.getAttackSpeed();
     }
@@ -237,6 +261,15 @@ public class WeaponItem extends Item {
 
     public void setDebugHitbox(boolean debug) {
         this.debugHitbox = debug;
+    }
+
+    // NEW: Configure hitbox activation delay
+    public void setHitboxActivationDelay(int frames) {
+        this.hitboxActivationDelay = frames;
+    }
+
+    public int getHitboxActivationDelay() {
+        return hitboxActivationDelay;
     }
 
     public WeaponHitBox getHitBox() { return hitBox; }

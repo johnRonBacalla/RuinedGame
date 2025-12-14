@@ -11,7 +11,8 @@ public class TileLibrary {
     private  final BufferedImage[] grassDirt;
     private  final BufferedImage[] dirtGrass;
     private  final BufferedImage[] wallWater;
-    private  final BufferedImage[] battle;
+    private  final BufferedImage[] battle1;
+    private  final BufferedImage[] battle2;
     private  final BufferedImage[] house;
     private  final BufferedImage[] mines;
     private  final BufferedImage[] plantTile;
@@ -34,8 +35,13 @@ public class TileLibrary {
             tiles.add(new Tile(img, false));
         }
 
-        this.battle = CutSprite.cut(LoadSprite.load("/tiles/4battle.png"), 64, 64, 5, 0);
-        for(BufferedImage img: battle){
+        this.battle1 = CutSprite.cut(LoadSprite.load("/tiles/4.1battle.png"), 64, 64, 3, 0);
+        for(BufferedImage img: battle1){
+            tiles.add(new Tile(img, false));
+        }
+
+        this.battle2 = CutSprite.cut(LoadSprite.load("/tiles/4.2battle.png"), 64, 64, 2, 0);
+        for(BufferedImage img: battle2){
             tiles.add(new Tile(img, true));
         }
 

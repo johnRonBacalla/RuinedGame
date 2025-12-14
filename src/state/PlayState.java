@@ -15,6 +15,7 @@ import inventory.*;
 import map.*;
 import physics.Position;
 import physics.box.Box;
+import spawner.WaveSpawner;
 import tile.Tile;
 import tile.TileScale;
 import ui.ItemButton;
@@ -54,6 +55,9 @@ public class PlayState extends State {
     private List<UiComponent> hud;
     private Point mouseInMap;
     private UiText mouseTile;
+
+    private WaveSpawner waveSpawner;
+    private int currentWave = 1;
 
     private PlacementManager placementManager;
 
@@ -132,6 +136,8 @@ public class PlayState extends State {
 
         inventoryOpen = false;
         inventory.printInventory();
+
+        waveSpawner = new WaveSpawner(spriteLibrary);
     }
 
     private void initializeHud() {
@@ -438,6 +444,18 @@ public class PlayState extends State {
 
                 lastPlacePressed = true;
             }
+        }
+        if (input.isPressed(KeyEvent.VK_ENTER) &&
+                mm.getCurrentLocation() == Location.BATTLE &&
+                !waveSpawner.isWaveActive()) {
+
+            waveSpawner.startWave("/spawns/wave" + currentWave + ".txt");
+        }
+
+        List<MovingEntity> newSpawns = waveSpawner.update(1.0 / 60.0); // deltaTime
+        for (MovingEntity entity : newSpawns) {
+            worldObjects.add(entity);
+            worldBoxes.add(entity.getBox());
         }
 
         if (!controller.isRequestingPlaceItem()) {

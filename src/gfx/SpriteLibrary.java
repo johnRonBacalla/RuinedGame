@@ -70,6 +70,9 @@ public class SpriteLibrary {
         loadSheet("iceTower2", "/placeable/iceTower2.png", 15, 64, 64, 0);
         loadSheet("earthTower2", "/placeable/earthTower2.png", 15, 64, 64, 0);
         loadSheet("windTower2", "/placeable/windTower2.png", 15, 64, 64, 0);
+
+        loadSheet("skeleAnim", "/mobs/skele.png", 4, 64, 64, 0);
+
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {

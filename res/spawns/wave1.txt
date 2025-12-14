@@ -1,0 +1,8 @@
+skele,5,1.0
+skele,3,2.0
+skele,5,1.0
+skele,3,2.0
+skele,5,1.0
+skele,3,2.0
+skele,5,1.0
+skele,3,2.0
