@@ -1,6 +1,7 @@
 package inventory;
 
 import entity.moving.MovingEntity;
+import entity.moving.Player;
 import gfx.SpriteLibrary;
 import weapon.WeaponData;
 
@@ -17,7 +18,7 @@ public class InventoryManager {
     private Item equippedItem;
     private MovingEntity owner;
 
-    public InventoryManager(SpriteLibrary spriteLibrary, MovingEntity player) {
+    public InventoryManager(SpriteLibrary spriteLibrary, Player player) {
         inventory = new HashMap<>();
         itemCatalog = new HashMap<>();
         this.spriteLibrary = spriteLibrary;
@@ -55,9 +56,29 @@ public class InventoryManager {
         BufferedImage earthIIRuneIcon = spriteLibrary.getFrame("catalog", 14);
         BufferedImage windIIRuneIcon = spriteLibrary.getFrame("catalog", 15);
 
-        itemCatalog.put(1, new WeaponItem(1, "Sword", swordIcon, swordData));
-        itemCatalog.put(2, new WeaponItem(2, "Spear", spearIcon, spearData));
-        itemCatalog.put(3, new WeaponItem(3, "Hammer", hammerIcon, hammerData));
+        // Create weapons
+        WeaponItem sword = new WeaponItem(1, "Sword", swordIcon, swordData);
+        WeaponItem spear = new WeaponItem(2, "Spear", spearIcon, spearData);
+        WeaponItem hammer = new WeaponItem(3, "Hammer", hammerIcon, hammerData);
+
+        // Configure sword hitbox
+        sword.setHitboxSize(40, 192);           // Width: 40, Height: 35
+        sword.setHitboxOffset(78, -64);          // Right-facing: 35px right, 5px down
+        sword.setInvertedHitboxOffset(-64, -64); // Left-facing: 75px left, 5px down
+
+        // Configure spear hitbox (longer range)
+        spear.setHitboxSize(128, 48);           // Longer width for spear reach
+        spear.setHitboxOffset(64, 16);          // Further out from player
+        spear.setInvertedHitboxOffset(-128, 16);
+
+        // Configure hammer hitbox (wider area)
+        hammer.setHitboxSize(64, 104);          // Square hitbox for hammer slam
+        hammer.setHitboxOffset(96, -20);
+        hammer.setInvertedHitboxOffset(-96, -24);
+
+        itemCatalog.put(1, sword);
+        itemCatalog.put(2, spear);
+        itemCatalog.put(3, hammer);
         itemCatalog.put(4, new WeaponItem(4, "Shovel", shovelIcon, shovelData));
 
         itemCatalog.put(5, new PotionItem(5, "Health Potion", healthPotIcon));
@@ -143,4 +164,3 @@ public class InventoryManager {
         return itemCatalog.get(itemId).getName();
     }
 }
-

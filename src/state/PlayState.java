@@ -13,10 +13,12 @@ import input.KeyInput;
 import input.MouseInput;
 import inventory.InventoryManager;
 import inventory.InventoryScale;
+import inventory.PlaceableItem;
 import inventory.WeaponItem;
 import map.*;
 import physics.Position;
 import physics.box.Box;
+import tile.Tile;
 import tile.TileScale;
 import ui.ItemButton;
 import ui.UiButton;
@@ -31,8 +33,7 @@ import java.util.List;
 public class PlayState extends State {
 
     private final PlayerController controller;
-    private final MovingEntity player;
-    private final SpriteLibrary sprites;
+    private final Player player;
 
     private final MapManager mm;
     private Map currentMap;
@@ -58,16 +59,11 @@ public class PlayState extends State {
     private UiText mouseTile;
 
     public static int Day = 1;
-
-    private Game game;
-
     public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
         super(game, spriteLibrary, input, mouseInput);
 
         this.game = game;
         controller = new PlayerController(input);
-        sprites = new SpriteLibrary();
-        inventory = new InventoryManager(sprites);
         inventoryView = new ArrayList<>();
         hud = new ArrayList<>();
 
@@ -302,7 +298,7 @@ public class PlayState extends State {
     }
 
     public void placeChest(int tileX, int tileY) {
-        Chest chest = new Chest(TileScale.of(tileX), TileScale.of(tileY), sprites);
+        Chest chest = new Chest(TileScale.of(tileX), TileScale.of(tileY), spriteLibrary);
 
         // Add to MapManager (persists across map changes)
         mm.addObject(mm.getCurrentLocation(), chest);
@@ -314,7 +310,6 @@ public class PlayState extends State {
         worldBoxes.add(chest.getBox());
 
         System.out.println("Placed chest at (" + tileX + ", " + tileY + ")");
-
     }
 
     public void saveGame() {
@@ -334,9 +329,9 @@ public class PlayState extends State {
             int playerTileY = TileScale.in(player.getPosition().getY());
             placeChest(playerTileX, playerTileY);
             lastPlacePressed = true;
-
-
         }
+
+        mouseInMap = mm.getMouseTile(mouseInput, camera);
 
         if (!controller.isRequestingPlaceItem()) {
             lastPlacePressed = false;
@@ -437,6 +432,41 @@ public class PlayState extends State {
                         ((WeaponItem) inventory.getEquippedItem()).render(g);
                     }
                 }
+            }
+        }
+
+        // Draw placement preview if PlaceableItem is equipped
+        if (!inventoryOpen && inventory.getEquippedItem() instanceof PlaceableItem) {
+            Point mouseTile = mm.getMouseTile(mouseInput, camera);
+
+            // Check if mouse tile is within map bounds
+            if (mouseTile.x >= 0 && mouseTile.x < currentMap.getTileWidth() &&
+                    mouseTile.y >= 0 && mouseTile.y < currentMap.getTileHeight()) {
+
+                // Get the tile at mouse position
+                int tileNum = currentMap.getMapTiles()[mouseTile.x][mouseTile.y];
+                Tile tile = currentMap.getTileLibrary().getTile(tileNum);
+
+                // Check if tile is solid (can place)
+                boolean canPlace = tile != null && tile.isSolid();
+
+                // Convert tile coordinates to pixel coordinates
+                int pixelX = mouseTile.x * 64;
+                int pixelY = mouseTile.y * 64;
+
+                // Draw semi-transparent box (green if can place, red if cannot)
+                if (canPlace) {
+                    g.setColor(new Color(0, 255, 0, 100)); // Green transparent
+                } else {
+                    g.setColor(new Color(255, 0, 0, 100)); // Red transparent
+                }
+
+                g.fillRect(pixelX, pixelY, 64, 64);
+
+                // Draw border
+                g.setColor(canPlace ? Color.GREEN : Color.RED);
+                g.setStroke(new BasicStroke(2));
+                g.drawRect(pixelX, pixelY, 64, 64);
             }
         }
 

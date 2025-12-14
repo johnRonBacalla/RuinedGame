@@ -11,6 +11,7 @@ public class Animate {
     private long delay;       // nanoseconds per frame
     private boolean loop;     // should the animation loop
     private boolean finished; // has the animation finished
+    private boolean playing;  // is the animation currently playing
 
     /**
      * Create animation.
@@ -26,6 +27,7 @@ public class Animate {
         this.lastTime = System.nanoTime();
         this.loop = loop;
         this.finished = false;
+        this.playing = true; // Start playing by default
     }
 
     /**
@@ -41,7 +43,7 @@ public class Animate {
      * Updates the animation. Should be called every tick.
      */
     public void update() {
-        if(finished) return;
+        if(finished || !playing) return;
 
         long currentTime = System.nanoTime();
         if(currentTime - lastTime >= delay) {
@@ -68,10 +70,48 @@ public class Animate {
     }
 
     /**
+     * Start/resume playing the animation.
+     */
+    public void play() {
+        playing = true;
+        lastTime = System.nanoTime(); // Reset timer to prevent frame skip
+    }
+
+    /**
+     * Pause the animation.
+     */
+    public void pause() {
+        playing = false;
+    }
+
+    /**
+     * Stop the animation (pause and reset to first frame).
+     */
+    public void stop() {
+        playing = false;
+        currentFrame = 0;
+        finished = false;
+    }
+
+    /**
      * Check if the animation has finished (useful for attack animations).
      */
     public boolean isFinished() {
         return finished;
+    }
+
+    /**
+     * Alias for isFinished() - more readable in some contexts.
+     */
+    public boolean hasFinished() {
+        return finished;
+    }
+
+    /**
+     * Check if the animation is currently playing.
+     */
+    public boolean isPlaying() {
+        return playing;
     }
 
     public BufferedImage getCurrentFrame() {

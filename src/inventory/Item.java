@@ -21,4 +21,3 @@ public abstract class Item {
 
     public abstract void render(Graphics2D g);
 }
-

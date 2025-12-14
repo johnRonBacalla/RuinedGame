@@ -3,20 +3,32 @@ package inventory;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
 import gfx.Animate;
-import physics.box.HitBox;
+import physics.box.WeaponHitBox;
 import weapon.WeaponData;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class WeaponItem extends Item {
     private MovingEntity owner;
-    private HitBox hitBox;
+    private WeaponHitBox hitBox;
     private double attackAngle;
     private boolean isAttacking;
     private int cooldownTimer;
 
-    private WeaponData weaponData; // Store weapon data here
+    private WeaponData weaponData;
     private Animate currentAnimation;
+
+    // Configurable hitbox properties
+    private double hitboxOffsetX;
+    private double hitboxOffsetY;
+    private double hitboxWidth;
+    private double hitboxHeight;
+
+    // Inverted offsets for left-facing
+    private double invertedHitboxOffsetX;
+    private double invertedHitboxOffsetY;
+
+    private boolean debugHitbox = true; // Toggle to show/hide hitbox
 
     public WeaponItem(int id, String name, BufferedImage icon, WeaponData weaponData) {
         super(id, name, icon);
@@ -25,11 +37,38 @@ public class WeaponItem extends Item {
         this.cooldownTimer = 0;
         this.attackAngle = 0;
         this.isAttacking = false;
+
+        // Default hitbox values
+        this.hitboxWidth = weaponData.getRange();
+        this.hitboxHeight = weaponData.getRange();
+        this.hitboxOffsetX = 30;
+        this.hitboxOffsetY = 0;
+        this.invertedHitboxOffsetX = -30 - hitboxWidth;
+        this.invertedHitboxOffsetY = 0;
     }
 
     public void setOwner(MovingEntity owner) {
         this.owner = owner;
-        this.hitBox = new HitBox(owner, weaponData.getDamage(), 0, 0, weaponData.getRange(), weaponData.getRange());
+        this.hitBox = new WeaponHitBox(owner, weaponData.getDamage(),
+                hitboxOffsetX, hitboxOffsetY, hitboxWidth, hitboxHeight);
+    }
+
+    private void updateHitboxOffset() {
+        if (hitBox == null || owner == null) return;
+
+        boolean facingLeft = false;
+        if (owner instanceof Player) {
+            Player player = (Player) owner;
+            facingLeft = player.getDirection() == 1;
+        }
+
+        if (facingLeft) {
+            hitBox.setOffsetX(invertedHitboxOffsetX);
+            hitBox.setOffsetY(invertedHitboxOffsetY);
+        } else {
+            hitBox.setOffsetX(hitboxOffsetX);
+            hitBox.setOffsetY(hitboxOffsetY);
+        }
     }
 
     @Override
@@ -51,9 +90,13 @@ public class WeaponItem extends Item {
             currentAnimation.reset();
         }
 
-        // Update hitbox separately
+        // Update hitbox
         if (hitBox != null) {
             hitBox.update();
+            // Update offset if hitbox is active (during attack)
+            if (hitBox.isActive()) {
+                updateHitboxOffset();
+            }
         }
     }
 
@@ -67,22 +110,20 @@ public class WeaponItem extends Item {
         // Get current frame
         BufferedImage frame = currentAnimation.getCurrentFrame();
 
-        // Check if player is facing left (assuming Player has a getDirection() method)
+        // Check if player is facing left
         boolean facingLeft = false;
         if (owner instanceof Player) {
             Player player = (Player) owner;
-            facingLeft = player.getDirection() == 1; // 1 = left, 0 = right
+            facingLeft = player.getDirection() == 1;
         }
 
         // Different offsets based on direction
         int offsetX, offsetY;
         if (facingLeft) {
-            // Offsets when facing LEFT
-            offsetX = 64; // Negative to move left
-            offsetY = -64;  // Adjust as needed
+            offsetX = 64;
+            offsetY = -64;
         } else {
-            // Offsets when facing RIGHT
-            offsetX = owner.getFrame().getWidth() - 64; // Original offset
+            offsetX = owner.getFrame().getWidth() - 64;
             offsetY = owner.getFrame().getHeight() - 128;
         }
 
@@ -91,14 +132,12 @@ public class WeaponItem extends Item {
 
         // Draw the weapon (flipped if facing left)
         if (facingLeft) {
-            // Flip horizontally
             g.drawImage(frame,
-                    weaponX, weaponY, // Start from right edge
-                    -192, 192, // Negative width flips it
+                    weaponX, weaponY,
+                    -192, 192,
                     null);
             g.drawRect(weaponX - 128, weaponY, 192, 192);
         } else {
-            // Normal rendering
             g.drawImage(frame, weaponX, weaponY, null);
             g.drawRect(weaponX, weaponY, 192, 192);
         }
@@ -106,12 +145,38 @@ public class WeaponItem extends Item {
         // Debug text
         g.setColor(Color.WHITE);
         g.drawString("WEAPON: " + (facingLeft ? "LEFT" : "RIGHT"), weaponX - 128, weaponY - 10);
+
+        // Render debug hitbox
+        if (debugHitbox && hitBox != null && hitBox.isActive()) {
+            renderDebugHitbox(g);
+        }
+    }
+
+    private void renderDebugHitbox(Graphics2D g) {
+        // Semi-transparent red fill
+        Color hitboxColor = new Color(255, 0, 0, 100);
+        g.setColor(hitboxColor);
+        g.fillRect(
+                (int) hitBox.getX(),
+                (int) hitBox.getY(),
+                (int) hitBox.getWidth(),
+                (int) hitBox.getHeight()
+        );
+
+        // Red border
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(2));
+        g.drawRect(
+                (int) hitBox.getX(),
+                (int) hitBox.getY(),
+                (int) hitBox.getWidth(),
+                (int) hitBox.getHeight()
+        );
     }
 
     public void attack() {
         System.out.println("Attack called!");
 
-        // Can't attack with non-renderable items (like shovel)
         if (!weaponData.isRenderable()) {
             System.out.println("Weapon not renderable");
             return;
@@ -134,14 +199,46 @@ public class WeaponItem extends Item {
         currentAnimation = weaponData.getAttackAnimation();
         currentAnimation.reset();
 
-        // Activate hitbox so the attack animation stays active
+        // Activate hitbox
         if (hitBox != null) {
             hitBox.activate(weaponData.getAttackDuration());
+            updateHitboxOffset(); // Set correct offset based on facing direction
         }
 
         cooldownTimer = weaponData.getAttackSpeed();
     }
 
-    public HitBox getHitBox() { return hitBox; }
+    // === Hitbox Configuration Methods ===
+
+    public void setHitboxSize(double width, double height) {
+        this.hitboxWidth = width;
+        this.hitboxHeight = height;
+        if (hitBox != null) {
+            hitBox.setWidth(width);
+            hitBox.setHeight(height);
+        }
+    }
+
+    public void setHitboxOffset(double offsetX, double offsetY) {
+        this.hitboxOffsetX = offsetX;
+        this.hitboxOffsetY = offsetY;
+        if (hitBox != null && owner != null) {
+            updateHitboxOffset();
+        }
+    }
+
+    public void setInvertedHitboxOffset(double offsetX, double offsetY) {
+        this.invertedHitboxOffsetX = offsetX;
+        this.invertedHitboxOffsetY = offsetY;
+        if (hitBox != null && owner != null) {
+            updateHitboxOffset();
+        }
+    }
+
+    public void setDebugHitbox(boolean debug) {
+        this.debugHitbox = debug;
+    }
+
+    public WeaponHitBox getHitBox() { return hitBox; }
     public boolean isAttacking() { return isAttacking; }
 }

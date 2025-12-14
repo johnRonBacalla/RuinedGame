@@ -7,13 +7,14 @@ import java.util.ArrayList;
 
 public class TileLibrary {
 
-    private ArrayList<Tile> tiles;
-    private BufferedImage[] grassDirt;
-    private BufferedImage[] dirtGrass;
-    private BufferedImage[] wallWater;
-    private BufferedImage[] battle;
-    private BufferedImage[] house;
-    private BufferedImage[] mines;
+    private final ArrayList<Tile> tiles;
+    private  final BufferedImage[] grassDirt;
+    private  final BufferedImage[] dirtGrass;
+    private  final BufferedImage[] wallWater;
+    private  final BufferedImage[] battle;
+    private  final BufferedImage[] house;
+    private  final BufferedImage[] mines;
+    private  final BufferedImage[] plantTile;
 
     public TileLibrary() {
         this.tiles = new ArrayList<>();
@@ -43,9 +44,14 @@ public class TileLibrary {
             tiles.add(new Tile(img, false));
         }
 
-        this.mines = CutSprite.cut(LoadSprite.load("/tiles/5mines.png"), 64, 64, 6, 0);
+        this.mines = CutSprite.cut(LoadSprite.load("/tiles/6mines.png"), 64, 64, 6, 0);
         for(BufferedImage img: mines){
             tiles.add(new Tile(img, false));
+        }
+
+        this.plantTile = CutSprite.cut(LoadSprite.load("/tiles/7plantile.png"), 64, 64, 9, 0);
+        for(BufferedImage img: plantTile){
+            tiles.add(new Tile(img, true));
         }
     }
 
