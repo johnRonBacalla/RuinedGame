@@ -65,16 +65,19 @@ public class InventoryManager {
         sword.setHitboxSize(40, 192);           // Width: 40, Height: 35
         sword.setHitboxOffset(78, -64);          // Right-facing: 35px right, 5px down
         sword.setInvertedHitboxOffset(-64, -64); // Left-facing: 75px left, 5px down
+        sword.setHitboxActivationDelay(20);
 
         // Configure spear hitbox (longer range)
         spear.setHitboxSize(128, 48);           // Longer width for spear reach
         spear.setHitboxOffset(64, 16);          // Further out from player
         spear.setInvertedHitboxOffset(-128, 16);
+        spear.setHitboxActivationDelay(20);
 
         // Configure hammer hitbox (wider area)
         hammer.setHitboxSize(64, 104);          // Square hitbox for hammer slam
         hammer.setHitboxOffset(96, -20);
         hammer.setInvertedHitboxOffset(-96, -24);
+        hammer.setHitboxActivationDelay(20);
 
         itemCatalog.put(1, sword);
         itemCatalog.put(2, spear);
