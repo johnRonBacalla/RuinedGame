@@ -31,7 +31,6 @@ public class PlayState extends State {
 
     private final PlayerController controller;
     private final MovingEntity player;
-    private final SpriteLibrary sprites;
 
     private final MapManager mm;
     private Map currentMap;
@@ -53,14 +52,15 @@ public class PlayState extends State {
     private Point mouseInMap;
     private UiText mouseTile;
 
+    public static int Day = 1;
+
     private Game game;
 
-    public PlayState(Game game, KeyInput input, MouseInput mouseInput) {
-        super(game, input, mouseInput);
+    public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
+        super(game, spriteLibrary, input, mouseInput);
 
         this.game = game;
         controller = new PlayerController(input);
-        sprites = new SpriteLibrary();
         inventoryView = new ArrayList<>();
         hud = new ArrayList<>();
 
@@ -71,12 +71,12 @@ public class PlayState extends State {
         currentObject = new ArrayList<>();
 
         // Player always separate first
-        player = new Player(this, TileScale.of(15), TileScale.of(8), 5, sprites);
+        player = new Player(this, TileScale.of(15), TileScale.of(8), 5, spriteLibrary);
         worldObjects.add(player);
-        inventory = new InventoryManager(sprites, player);
+        inventory = new InventoryManager(spriteLibrary, player);
 
         // Map Manager + debug map
-        mm = new MapManager(sprites);
+        mm = new MapManager(spriteLibrary);
         debug = new GridMap(36, 15);
 
         //fetch objects
@@ -88,7 +88,7 @@ public class PlayState extends State {
         worldBoxes.addAll(currentBox);
 //        debug = new GridMap(26, 15);
 
-//        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
+//        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", spriteLibrary);
 //
 //        if (state != null) {
 //            System.out.println("Loading Chest ");
@@ -107,7 +107,7 @@ public class PlayState extends State {
 //        }
 
         // Load map objects from CSV
-//        List<GameObject> mapObjects = SpawnObjects.loadObjects("/mapText/farmObjs.csv", sprites);
+//        List<GameObject> mapObjects = SpawnObjects.loadObjects("/mapText/farmObjs.csv", spriteLibrary);
 //        worldObjects.addAll(mapObjects);
 
         // Add their collision boxes to worldBoxes
@@ -137,7 +137,7 @@ public class PlayState extends State {
     }
 
     private void initializeInventory() {
-        UiButton item1 = new ItemButton(sprites, inventory,
+        UiButton item1 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(2)), 1, () -> {
             if(inventory.getItemStack(1).getQuantity() != 0){
@@ -146,7 +146,7 @@ public class PlayState extends State {
             }
         });
 
-        UiButton item2 = new ItemButton(sprites, inventory,
+        UiButton item2 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(2)), 2, () -> {
             if(inventory.getItemStack(2).getQuantity() != 0){
@@ -154,7 +154,7 @@ public class PlayState extends State {
                 handleItemEquip(2);
             }
         });
-        UiButton item3 = new ItemButton(sprites, inventory,
+        UiButton item3 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(2)), 3, () -> {
             if(inventory.getItemStack(3).getQuantity() != 0){
@@ -162,7 +162,7 @@ public class PlayState extends State {
                 handleItemEquip(3);
             }
         });
-        UiButton item4 = new ItemButton(sprites, inventory,
+        UiButton item4 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(2)), 4, () -> {
             if(inventory.getItemStack(4).getQuantity() != 0){
@@ -171,7 +171,7 @@ public class PlayState extends State {
             }
         });
 
-        UiButton item5 = new ItemButton(sprites, inventory,
+        UiButton item5 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(3)), 5, () -> {
             if(inventory.getItemStack(5).getQuantity() != 0){
@@ -179,7 +179,7 @@ public class PlayState extends State {
                 handleItemEquip(5);
             }
         });
-        UiButton item6 = new ItemButton(sprites, inventory,
+        UiButton item6 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(3)), 6, () -> {
             if(inventory.getItemStack(6).getQuantity() != 0){
@@ -187,7 +187,7 @@ public class PlayState extends State {
                 handleItemEquip(6);
             }
         });
-        UiButton item7 = new ItemButton(sprites, inventory,
+        UiButton item7 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(3)), 7, () -> {
             if(inventory.getItemStack(7).getQuantity() != 0){
@@ -195,7 +195,7 @@ public class PlayState extends State {
                 handleItemEquip(7);
             }
         });
-        UiButton item8 = new ItemButton(sprites, inventory,
+        UiButton item8 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(3)), 8, () -> {
             if(inventory.getItemStack(8).getQuantity() != 0){
@@ -204,7 +204,7 @@ public class PlayState extends State {
             }
         });
 
-        UiButton item9 = new ItemButton(sprites, inventory,
+        UiButton item9 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(4)), 9, () -> {
             if(inventory.getItemStack(9).getQuantity() != 0){
@@ -212,7 +212,7 @@ public class PlayState extends State {
                 handleItemEquip(9);
             }
         });
-        UiButton item10 = new ItemButton(sprites, inventory,
+        UiButton item10 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(4)), 10, () -> {
             if(inventory.getItemStack(10).getQuantity() != 0){
@@ -220,7 +220,7 @@ public class PlayState extends State {
                 handleItemEquip(10);
             }
         });
-        UiButton item11 = new ItemButton(sprites, inventory,
+        UiButton item11 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(4)), 11, () -> {
             if(inventory.getItemStack(11).getQuantity() != 0){
@@ -228,7 +228,7 @@ public class PlayState extends State {
                 handleItemEquip(11);
             }
         });
-        UiButton item12 = new ItemButton(sprites, inventory,
+        UiButton item12 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(4)), 12, () -> {
             if(inventory.getItemStack(12).getQuantity() != 0){
@@ -237,7 +237,7 @@ public class PlayState extends State {
             }
         });
 
-        UiButton item13 = new ItemButton(sprites, inventory,
+        UiButton item13 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(5)), 13, () -> {
             if(inventory.getItemStack(13).getQuantity() != 0){
@@ -245,7 +245,7 @@ public class PlayState extends State {
                 handleItemEquip(13);
             }
         });
-        UiButton item14 = new ItemButton(sprites, inventory,
+        UiButton item14 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(5)), 14, () -> {
             if(inventory.getItemStack(14).getQuantity() != 0){
@@ -253,7 +253,7 @@ public class PlayState extends State {
                 handleItemEquip(14);
             }
         });
-        UiButton item15 = new ItemButton(sprites, inventory,
+        UiButton item15 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(5)), 15, () -> {
             if(inventory.getItemStack(15).getQuantity() != 0){
@@ -261,7 +261,7 @@ public class PlayState extends State {
                 handleItemEquip(15);
             }
         });
-        UiButton item16 = new ItemButton(sprites, inventory,
+        UiButton item16 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(5)), 16, () -> {
             if(inventory.getItemStack(16).getQuantity() != 0){

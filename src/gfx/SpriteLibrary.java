@@ -37,7 +37,7 @@ public class SpriteLibrary {
         loadSheet("longButton", "/assets/longButton.png", 2, 288, 86, 0);
         loadSheet("midButton", "/assets/midButton.png", 2, 164, 86, 0);
         loadSheet("shortButton", "/assets/shortButton.png", 2, 90, 86, 0);
-
+        loadSheet("fenceButton", "/assets/fenceButton.png", 2, 172, 378, 0);
         loadSheet("giantButton", "/assets/giantButton.png", 2, 576, 172, 0);
         loadSheet("logo", "/assets/logo.png", 1, 690, 214, 0);
 

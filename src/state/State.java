@@ -1,6 +1,7 @@
 package state;
 
 import core.Game;
+import gfx.SpriteLibrary;
 import input.MouseInput;
 import physics.Size;
 import input.KeyInput;
@@ -14,11 +15,13 @@ public abstract class State {
     protected KeyInput input;
     protected MouseInput mouseInput;
     protected Size stateSize;
+    protected SpriteLibrary spriteLibrary;
 
-    public State(Game game, KeyInput input, MouseInput mouseInput) {
+    public State(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
         this.input = input;
         this.mouseInput = mouseInput;
         this.stateSize = game.getWindowSize();
+        this.spriteLibrary = spriteLibrary;
     }
 
     public abstract void update();

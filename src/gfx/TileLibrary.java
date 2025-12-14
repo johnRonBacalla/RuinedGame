@@ -41,6 +41,11 @@ public class TileLibrary {
         for(BufferedImage img: house){
             tiles.add(new Tile(img, false));
         }
+
+        this.house = CutSprite.cut(LoadSprite.load("/tiles/6plantile.png"), 64, 64, 9, 0);
+        for(BufferedImage img: house){
+            tiles.add(new Tile(img, true));
+        }
     }
 
     public Tile getTile(int id){

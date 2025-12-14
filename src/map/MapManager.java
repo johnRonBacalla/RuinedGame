@@ -88,18 +88,18 @@ public class MapManager {
         topBorder.setCollision(0, -16, 36, 4);
 
         Border leftBorder = new Border(TileScale.of(0), TileScale.of(0), sprites);
-        leftBorder.setCollision(0, 0, 3, 15);
+        leftBorder.setCollision(0, 0, 3, 17);
 
         Border rightBorder = new Border(TileScale.of(36), TileScale.of(0), sprites);
         rightBorder.setCollision(0, 0, 1, 15);
 
-        Border bottomBorder = new Border(TileScale.of(0), TileScale.of(15), sprites);
+        Border bottomBorder = new Border(TileScale.of(0), TileScale.of(17), sprites);
         bottomBorder.setCollision(0, 0, 36, 1);
 
         Border topRiver = new Border(TileScale.of(29), TileScale.of(4), sprites);
         topRiver.setCollision(0, -48, 4, 6);
 
-        Border bottomRiver = new Border(TileScale.of(29), TileScale.of(11), sprites);
+        Border bottomRiver = new Border(TileScale.of(29), TileScale.of(13), sprites);
         bottomRiver.setCollision(0, 16, 4, 4);
 
         Gate minesGate = new Gate(TileScale.of(21), TileScale.of(3), sprites);

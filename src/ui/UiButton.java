@@ -26,6 +26,19 @@ public abstract class UiButton extends UiComponent {
         this.buttonText = null;
     }
 
+    protected void centerText() {
+        if (buttonText == null) return;
+
+        int textX = position.intX()
+                + (size.getWidth() - buttonText.getSize().getWidth()) / 2;
+
+        int textY = position.intY()
+                + (size.getHeight() - buttonText.getSize().getHeight()) / 2;
+
+        buttonText.setPosition(new Position(textX, textY));
+    }
+
+
     public void update(int mouseX, int mouseY, boolean mousePressed) {
         hovered = contains(mouseX, mouseY);
 
