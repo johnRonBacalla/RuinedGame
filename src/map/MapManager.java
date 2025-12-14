@@ -68,8 +68,11 @@ public class MapManager {
         this.houseObjects = SpawnObjects.loadObjects("/mapText/objects/houseObjs.csv", sprites);
 
         // Load from specific save file OR default
-        String fileToLoad = (saveFilePath != null) ? saveFilePath : "res/saves/game_save.txt";
-        this.savedFileObjects = GameLoader.loadFromSave(fileToLoad, sprites);
+        this.savedFileObjects = null;
+
+        if (saveFilePath != null) {
+            this.savedFileObjects = GameLoader.loadFromSave(saveFilePath, sprites);
+        }
 
         loadFarmAssets();
         loadMinesAssets();
@@ -220,7 +223,7 @@ public class MapManager {
         }
     }
 
-    public void saveAllObjects(int waveNumber) {
+    public void saveAllObjects(String saveFileName, int waveNumber) {
         java.util.Map<String, List<String>> gameData = new HashMap<>();
         List<String> placables = new ArrayList<>();
         List<String> seeds = new ArrayList<>();
@@ -229,7 +232,7 @@ public class MapManager {
         placables.add("entity_type,x,y,location");
         seeds.add("plant_type,x,y,location,stage");
 
-        // Save objects from ALL locations (both placables AND seeds)
+        // Save objects from ALL locations
         addObjectsToSave(placables, seeds, farmObjects, Location.FARM);
         addObjectsToSave(placables, seeds, battleObjects, Location.BATTLE);
         addObjectsToSave(placables, seeds, minesObjects, Location.MINES);
@@ -238,7 +241,7 @@ public class MapManager {
         gameData.put("PLACABLES", placables);
         gameData.put("SEEDS", seeds);
 
-        SaveManager.saveGame(waveNumber, gameData);
+        SaveManager.saveGame(saveFileName, waveNumber, gameData); // Pass file name
 
         System.out.println("Saved " + (placables.size() - 1) + " placables and " + (seeds.size() - 1) + " seeds");
     }

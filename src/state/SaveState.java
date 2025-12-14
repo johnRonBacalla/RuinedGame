@@ -22,6 +22,7 @@ public class SaveState extends State {
 
     private BufferedImage ground;
     private BufferedImage skyParalax;
+    private BufferedImage cutScene1;
     private double x;
     private double speedX;
 
@@ -51,8 +52,25 @@ public class SaveState extends State {
         // New Game button
         newGameButton = new SignButton(spriteLibrary, "NEW\nGAME",
                 new Position(stateSize.getWidth() / 2 - 86, 450), () -> {
-            System.out.println("Starting new game");
-            game.setState(new PlayState(game, spriteLibrary, keyInput, mouse));
+            System.out.println("Starting cutscene...");
+
+            // List all your cutscene images in order
+            List<String> cutsceneSlides = List.of(
+                    "/cutScenes/1st.png",
+                    "/cutScenes/2nd.png",
+                    "/cutScenes/3rd.png",
+                    "/cutScenes/4th.png"
+            );
+
+            // What happens when cutscene ends
+            Runnable startNewGame = () -> {
+                System.out.println("Cutscene finished. Starting new game.");
+                game.setState(new PlayState(game, spriteLibrary, keyInput, mouseInput)); // New game, no save path
+            };
+
+            // Switch to cutscene state
+            game.setState(new CutsceneState(game, spriteLibrary, keyInput, mouseInput,
+                    cutsceneSlides, startNewGame));
         });
     }
 

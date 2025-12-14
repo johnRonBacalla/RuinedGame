@@ -24,6 +24,7 @@ import ui.UiText;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class PlayState extends State {
 
     private final PlayerController controller;
     private final MovingEntity player;
-
+    private String currentSaveFileName;
     private final MapManager mm;
     private Map currentMap;
     private final Map debug;
@@ -69,7 +70,14 @@ public class PlayState extends State {
         super(game, spriteLibrary, input, mouseInput);
 
         this.game = game;
-        this.saveFilePath = saveFilePath; // Store the save file path
+        // Extract filename from path or create new save name
+        if (saveFilePath != null) {
+            File file = new File(saveFilePath);
+            this.currentSaveFileName = file.getName().replace(".txt", "");
+        } else {
+            // Generate a unique save name for new games
+            this.currentSaveFileName = "save_" + System.currentTimeMillis();
+        }
 
         controller = new PlayerController(input);
         inventoryView = new ArrayList<>();
@@ -300,8 +308,8 @@ public class PlayState extends State {
     }
 
     public void saveGame() {
-        mm.saveAllObjects(1); // Pass wave number
-        System.out.println("Game saved!");
+        mm.saveAllObjects(currentSaveFileName, 1); // Pass the save file name
+        System.out.println("Game saved to: " + currentSaveFileName);
     }
 
     public MapManager getMapManager() {

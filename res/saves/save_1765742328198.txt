@@ -2,10 +2,8 @@ WAVE:1
 
 [SEEDS]
 plant_type,x,y,location,stage
-wind,19,5,FARM,0
-wind,22,5,FARM,0
-ice,21,6,FARM,0
-ice,19,6,FARM,0
+earth,23,5,FARM,0
+earth,21,5,FARM,0
 
 [PLACABLES]
 entity_type,x,y,location
