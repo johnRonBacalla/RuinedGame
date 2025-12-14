@@ -1,5 +1,6 @@
-package entity.moving;
+package entity.moving.mobs;
 
+import entity.moving.MovingEntity;
 import gfx.Animate;
 import gfx.SpriteLibrary;
 import physics.box.Box;
@@ -7,12 +8,12 @@ import physics.box.Sensor;
 
 import java.util.List;
 
-public class Skele extends MovingEntity{
+public class Goblin extends MovingEntity {
 
     private Sensor sensor;
     private boolean frozenByWall = false;
 
-    public Skele(double x, double y, SpriteLibrary sprites) {
+    public Goblin(double x, double y, SpriteLibrary sprites) {
         super(x, y, 1, sprites);
 
         // Configure Skele stats
@@ -25,10 +26,11 @@ public class Skele extends MovingEntity{
         // Configure hurtbox (adjust these values to fit your skeleton sprite)
         setHurtBox(8, 8, 48, 56); // offsetX, offsetY, width, height
 
-        animations.put("skeleAnim", new Animate(sprites.get("skeleAnim"), 8));
-        currentAnimation = animations.get("skeleAnim");
+        animations.put("goblinAnim", new Animate(sprites.get("goblinAnim"), 8));
+        currentAnimation = animations.get("goblinAnim");
     }
 
+    @Override
     public void update(List<Box> boxes) {
         // Don't move or update if dead
         if (isDead) {

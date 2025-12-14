@@ -1,7 +1,6 @@
 package map;
 
 import entity.GameObject;
-import entity.moving.Skele;
 import entity.placeable.EarthPlant;
 import entity.placeable.FirePlant;
 import entity.placeable.IcePlant;

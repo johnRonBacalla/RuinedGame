@@ -1,6 +1,7 @@
 package spawner;
 
 import entity.moving.*;
+import entity.moving.mobs.*;
 import gfx.SpriteLibrary;
 import tile.TileScale;
 import java.io.BufferedReader;
@@ -145,7 +146,7 @@ public class WaveSpawner {
                 return new Goblin(x, y, sprites);
             case "golem":
                 return new Golem(x, y, sprites);
-            case "magmabomber":
+            case "magma":
                 return new MagmaBomber(x, y, sprites);
             case "ogre":
                 return new Ogre(x, y, sprites);
@@ -153,7 +154,8 @@ public class WaveSpawner {
                 return new Succubus(x, y, sprites);
             case "witch":
                 return new Witch(x, y, sprites);
-
+            case "armor":
+                return new ArmoredSkele(x, y, sprites);
             default:
                 System.err.println("Unknown mob type: " + mobType);
                 return null;

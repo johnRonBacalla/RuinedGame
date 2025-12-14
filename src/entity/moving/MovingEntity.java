@@ -3,9 +3,13 @@ package entity.moving;
 import entity.GameObject;
 import physics.Motion;
 import physics.box.HurtBox;
+import physics.box.Sensor;
 import physics.box.WeaponHitBox;
 import gfx.Animate;
 import gfx.SpriteLibrary;
+import java.util.List;
+import physics.box.Box;
+import javax.swing.*;
 import java.awt.*;
 
 public class MovingEntity extends GameObject {
@@ -40,6 +44,12 @@ public class MovingEntity extends GameObject {
 
         this.wasHit = false;
         this.hitFlashTimer = 0;
+    }
+
+    public void update(List<Box> boxes) {
+        // default movement integration
+        applyMotion();
+        super.update();
     }
 
     @Override

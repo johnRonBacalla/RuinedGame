@@ -6,12 +6,11 @@ import core.Game;
 import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
-import entity.moving.Skele;
+import entity.moving.mobs.Skele;
 import entity.placeable.towers.EarthTower1;
 import entity.placeable.towers.Tower;
 import entity.placeable.towers.WindTower1;
 import entity.stable.Bridge;
-import entity.stable.Chest;
 import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
@@ -20,7 +19,6 @@ import map.*;
 import physics.Position;
 import physics.box.Box;
 import spawner.WaveSpawner;
-import tile.Tile;
 import tile.TileScale;
 import ui.ItemButton;
 import ui.UiButton;
@@ -527,13 +525,14 @@ public class PlayState extends State {
         // Update all game objects
         for (GameObject obj : worldObjects) {
             if (obj instanceof Player p) {
-                p.update(worldBoxes); // Player needs worldBoxes for collision
-            } else if (obj instanceof Skele skele) {
-                skele.update(worldBoxes); // Enemies need worldBoxes to detect walls
+                p.update(worldBoxes);
+            } else if (obj instanceof MovingEntity m) {
+                m.update(worldBoxes); // 🔥 Skele, Ogre, future mobs
             } else {
-                obj.update(); // Regular update for other objects
+                obj.update();
             }
         }
+
 
         // ===== TOWER RANGE TOGGLE (DEBUG) =====
         // Optional: Toggle tower range display with T key

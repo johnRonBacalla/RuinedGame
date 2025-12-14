@@ -81,6 +81,7 @@ public class SpriteLibrary {
         loadSheet("ogreAnim", "/mobs/ogre.png", 8, 96, 96, 0);
         loadSheet("succubusAnim", "/mobs/succubus.png", 4, 64, 64, 0);
         loadSheet("witchAnim", "/mobs/witch.png", 4, 64, 64, 0);
+        loadSheet("armoredSkeleAnim", "/mobs/armoredSkele.png", 4, 64, 64, 0);
 
 
 
