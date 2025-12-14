@@ -4,6 +4,19 @@ WAVE:1
 plant_type,x,y,location,stage
 fire,18,5,FARM,0
 fire,18,6,FARM,0
+ice,21,6,FARM,0
+ice,21,5,FARM,0
+ice,22,7,FARM,0
+ice,23,6,FARM,0
+ice,23,5,FARM,0
+ice,24,5,FARM,0
+ice,24,6,FARM,0
+ice,24,7,FARM,0
+fire,19,6,FARM,0
+fire,19,7,FARM,0
+fire,20,7,FARM,0
+fire,21,7,FARM,0
+fire,22,6,FARM,0
 
 [PLACABLES]
 entity_type,x,y,location
