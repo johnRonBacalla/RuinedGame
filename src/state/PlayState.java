@@ -11,10 +11,7 @@ import entity.stable.Chest;
 import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
-import inventory.InventoryManager;
-import inventory.InventoryScale;
-import inventory.PlaceableItem;
-import inventory.WeaponItem;
+import inventory.*;
 import map.*;
 import physics.Position;
 import physics.box.Box;
@@ -58,6 +55,8 @@ public class PlayState extends State {
     private Point mouseInMap;
     private UiText mouseTile;
 
+    private PlacementManager placementManager;
+
     public static int Day = 1;
     public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
         super(game, spriteLibrary, input, mouseInput);
@@ -89,6 +88,7 @@ public class PlayState extends State {
         currentMap = mm.getCurrentMap();
         worldObjects.addAll(currentObject);
         worldBoxes.addAll(currentBox);
+        placementManager = new PlacementManager(spriteLibrary, mm);
 //        debug = new GridMap(26, 15);
 
 //        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", spriteLibrary);
@@ -143,6 +143,7 @@ public class PlayState extends State {
         UiButton item1 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(2)), 1, () -> {
+
             if(inventory.getItemStack(1).getQuantity() != 0){
                 System.out.println(inventory.getItemName(1));
                 handleItemEquip(1);
@@ -297,19 +298,23 @@ public class PlayState extends State {
         } else inventory.removeEquippedItem();
     }
 
-    public void placeChest(int tileX, int tileY) {
-        Chest chest = new Chest(TileScale.of(tileX), TileScale.of(tileY), spriteLibrary);
+    public void reassignAll(Location location){
+        // Filter out removed objects
+        for (GameObject obj : mm.getCurrentMapObjects()) {
+            if (!placementManager.wasRemoved(location, obj)) {
+                currentObject.add(obj);
+            }
+        }
 
-        // Add to MapManager (persists across map changes)
-        mm.addObject(mm.getCurrentLocation(), chest);
+        for (GameObject obj : currentObject) {
+            currentBox.add(obj.getBox());
+        }
 
-        currentObject.add(chest);
-        worldObjects.add(chest);
+        worldObjects.add(player);
+        worldBoxes.add(player.getBox());
 
-        currentBox.add(chest.getBox());
-        worldBoxes.add(chest.getBox());
-
-        System.out.println("Placed chest at (" + tileX + ", " + tileY + ")");
+        worldObjects.addAll(currentObject);
+        worldBoxes.addAll(currentBox);
     }
 
     public void saveGame() {
@@ -321,67 +326,6 @@ public class PlayState extends State {
         return mm;
     }
     private boolean lastPlacePressed = false;
-
-    @Override
-    public void update() {
-        if (controller.isRequestingPlaceItem() && !lastPlacePressed) {
-            int playerTileX = TileScale.in(player.getPosition().getX());
-            int playerTileY = TileScale.in(player.getPosition().getY());
-            placeChest(playerTileX, playerTileY);
-            lastPlacePressed = true;
-        }
-
-        mouseInMap = mm.getMouseTile(mouseInput, camera);
-
-        if (!controller.isRequestingPlaceItem()) {
-            lastPlacePressed = false;
-        }
-        if (input.isPressed(KeyEvent.VK_E)) {
-            inventoryOpen = !inventoryOpen;
-        }
-
-        // Handle weapon attacks with SPACE BAR
-        if (!inventoryOpen && input.isPressed(KeyEvent.VK_SPACE)) {
-            if (inventory.getEquippedItem() instanceof WeaponItem) {
-                WeaponItem weapon = (WeaponItem) inventory.getEquippedItem();
-                weapon.attack();
-            }
-        }
-
-        mouseTile.setText(String.valueOf(mm.getMouseTile(mouseInput, camera)));
-
-        player.getMotion().update(controller);
-        player.applyMotion();
-
-        for (GameObject obj : worldObjects) {
-            if (obj instanceof Player p) p.update(worldBoxes);
-            else obj.update();
-        }
-
-        if (inventoryOpen) {
-            for (UiComponent component : inventoryView) {
-                component.update();
-                if (component instanceof UiButton button) {
-                    button.update(
-                            mouseInput.getMouseX(),
-                            mouseInput.getMouseY(),
-                            mouseInput.isLeftPressed()
-                    );
-                }
-            }
-        }
-
-        for(UiComponent component: hud){
-            component.update();
-        }
-
-        if(inventory.getEquippedItem() != null){
-            inventory.getEquippedItem().update();
-        }
-
-        sortObjectsByPosition();
-        camera.update(player);
-    }
 
     private void sortObjectsByPosition() {
         worldObjects.sort((a, b) -> {
@@ -401,10 +345,152 @@ public class PlayState extends State {
     }
 
     @Override
+    public void update() {
+        Location currentLocation = mm.getCurrentLocation();
+        mouseInMap = mm.getMouseTile(mouseInput, camera);
+
+        // Only allow placement in FARM and BATTLE
+        if (currentLocation == Location.FARM || currentLocation == Location.BATTLE) {
+
+            // SHOVEL EQUIPPED
+            if (inventory.getEquippedItem() instanceof WeaponItem &&
+                    inventory.getEquippedItem().getId() == 4) {
+
+                // R key = Remove placeable
+                if (input.isPressed(KeyEvent.VK_R)) {
+                    placementManager.removeObjectAt(
+                            mouseInMap.x, mouseInMap.y, currentMap, currentLocation,
+                            currentObject, worldObjects, currentBox, worldBoxes
+                    );
+                }
+
+                // F key = Harvest
+                if (input.isPressed(KeyEvent.VK_F)) {
+                    System.out.println("harvest");
+                }
+            }
+            // PLACEABLE ITEMS - Left click to place
+            else if (inventory.getEquippedItem() instanceof PlaceableItem &&
+                    controller.isRequestingPlaceItem() && !lastPlacePressed) {
+
+                PlaceableItem placeable = (PlaceableItem) inventory.getEquippedItem();
+                GameObject placedObject = null;
+
+                switch (placeable.getId()) {
+                    case 9: // Fire Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeFirePlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeFireTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 10: // Ice Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeIcePlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeIceTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 11: // Earth Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeEarthPlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeEarthTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 12: // Wind Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeWindPlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeWindTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 13: // Fire Rune II
+                        placedObject = placementManager.placeFireTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 14: // Ice Rune II
+                        placedObject = placementManager.placeIceTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 15: // Earth Rune II
+                        placedObject = placementManager.placeEarthTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 16: // Wind Rune II
+                        placedObject = placementManager.placeWindTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+                }
+
+                // Add placed object to world
+                if (placedObject != null) {
+                    mm.addObject(currentLocation, placedObject);
+                    currentObject.add(placedObject);
+                    worldObjects.add(placedObject);
+                    currentBox.add(placedObject.getBox());
+                    worldBoxes.add(placedObject.getBox());
+
+                    // Decrement quantity
+                    ItemStack stack = inventory.getItemStack(placeable.getId());
+                    if (stack != null && stack.getQuantity() > 0) {
+                        stack.setQuantity(stack.getQuantity() - 1);
+                        if (stack.getQuantity() == 0) {
+                            inventory.removeEquippedItem();
+                        }
+                    }
+                }
+
+                lastPlacePressed = true;
+            }
+        }
+
+        if (!controller.isRequestingPlaceItem()) {
+            lastPlacePressed = false;
+        }
+
+        if (input.isPressed(KeyEvent.VK_E)) {
+            inventoryOpen = !inventoryOpen;
+        }
+
+        // Handle weapon attacks
+        if (!inventoryOpen && input.isPressed(KeyEvent.VK_SPACE)) {
+            if (inventory.getEquippedItem() instanceof WeaponItem) {
+                WeaponItem weapon = (WeaponItem) inventory.getEquippedItem();
+                weapon.attack();
+            }
+        }
+
+        mouseTile.setText(String.valueOf(mouseInMap));
+
+        player.getMotion().update(controller);
+        player.applyMotion();
+
+        for (GameObject obj : worldObjects) {
+            if (obj instanceof Player p) p.update(worldBoxes);
+            else obj.update();
+        }
+
+        if (inventoryOpen) {
+            for (UiComponent component : inventoryView) {
+                component.update();
+                if (component instanceof UiButton button) {
+                    button.update(mouseInput.getMouseX(), mouseInput.getMouseY(), mouseInput.isLeftPressed());
+                }
+            }
+        }
+
+        for(UiComponent component: hud){
+            component.update();
+        }
+
+        if(inventory.getEquippedItem() != null){
+            inventory.getEquippedItem().update();
+        }
+
+        sortObjectsByPosition();
+        camera.update(player);
+    }
+
+    @Override
     public void render(Graphics2D g) {
         camera.apply(g);
 
-        // --- Frustum culling: only render objects inside camera view ---
         Rectangle view = new Rectangle(
                 (int) camera.getX(),
                 (int) camera.getY(),
@@ -413,7 +499,6 @@ public class PlayState extends State {
         );
 
         mm.render(g, view);
-        debug.render(g);
 
         for (GameObject obj : worldObjects) {
             Rectangle objRect = new Rectangle(
@@ -426,58 +511,32 @@ public class PlayState extends State {
             if (view.intersects(objRect)) {
                 obj.render(g);
 
-                // Render weapon ON TOP of player when equipped
-                if (obj instanceof Player) {
-                    if (inventory.getEquippedItem() instanceof WeaponItem) {
-                        ((WeaponItem) inventory.getEquippedItem()).render(g);
-                    }
+                if (obj instanceof Player && inventory.getEquippedItem() instanceof WeaponItem) {
+                    ((WeaponItem) inventory.getEquippedItem()).render(g);
                 }
             }
         }
 
-        // Draw placement preview if PlaceableItem is equipped
-        if (!inventoryOpen && inventory.getEquippedItem() instanceof PlaceableItem) {
-            Point mouseTile = mm.getMouseTile(mouseInput, camera);
+        Location currentLocation = mm.getCurrentLocation();
 
-            // Check if mouse tile is within map bounds
-            if (mouseTile.x >= 0 && mouseTile.x < currentMap.getTileWidth() &&
-                    mouseTile.y >= 0 && mouseTile.y < currentMap.getTileHeight()) {
-
-                // Get the tile at mouse position
-                int tileNum = currentMap.getMapTiles()[mouseTile.x][mouseTile.y];
-                Tile tile = currentMap.getTileLibrary().getTile(tileNum);
-
-                // Check if tile is solid (can place)
-                boolean canPlace = tile != null && tile.isSolid();
-
-                // Convert tile coordinates to pixel coordinates
-                int pixelX = mouseTile.x * 64;
-                int pixelY = mouseTile.y * 64;
-
-                // Draw semi-transparent box (green if can place, red if cannot)
-                if (canPlace) {
-                    g.setColor(new Color(0, 255, 0, 100)); // Green transparent
-                } else {
-                    g.setColor(new Color(255, 0, 0, 100)); // Red transparent
-                }
-
-                g.fillRect(pixelX, pixelY, 64, 64);
-
-                // Draw border
-                g.setColor(canPlace ? Color.GREEN : Color.RED);
-                g.setStroke(new BasicStroke(2));
-                g.drawRect(pixelX, pixelY, 64, 64);
+        // Only show previews in FARM and BATTLE
+        if (!inventoryOpen && (currentLocation == Location.FARM || currentLocation == Location.BATTLE)) {
+            // Green/Red preview for placeable items
+            if (inventory.getEquippedItem() instanceof PlaceableItem) {
+                placementManager.renderPlacementPreview(g, mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+            }
+            // Blue outline for shovel
+            else if (inventory.getEquippedItem() instanceof WeaponItem && inventory.getEquippedItem().getId() == 4) {
+                placementManager.renderShovelOutline(g, mouseInMap.x, mouseInMap.y, currentMap);
             }
         }
 
-        // Render collision boxes (optional)
+        // Render collision boxes (debug)
         for (GameObject obj : worldObjects) {
             Box box = obj.getBox();
             Rectangle boxRect = new Rectangle(
-                    (int) box.getX(),
-                    (int) box.getY(),
-                    (int) box.getWidth(),
-                    (int) box.getHeight()
+                    (int) box.getX(), (int) box.getY(),
+                    (int) box.getWidth(), (int) box.getHeight()
             );
 
             if (view.intersects(boxRect)) {
@@ -511,17 +570,6 @@ public class PlayState extends State {
         worldBoxes.clear();
     }
 
-    public void reassignAll(){
-        currentObject.addAll(mm.getCurrentMapObjects());
-        currentBox.addAll(mm.getCurrentMapBoxes());
-
-        worldObjects.add(player);
-        worldBoxes.add(player.getBox());
-
-        worldObjects.addAll(currentObject);
-        worldBoxes.addAll(currentBox);
-    }
-
     public void changeCurrentMap(Location type) {
         mm.changeMap(type);
         currentMap = mm.getCurrentMap();
@@ -530,19 +578,19 @@ public class PlayState extends State {
         switch (type){
             case MINES:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
             case BATTLE:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
             case FARM:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
             case HOUSE:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
         }
 
@@ -553,4 +601,5 @@ public class PlayState extends State {
                 currentMap.getHeightInPx()
         );
     }
+
 }

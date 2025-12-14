@@ -8,6 +8,10 @@ public class PlaceableItem extends Item{
         super(id, name, icon);
     }
 
+    public int getId(){
+        return id;
+    }
+
     @Override
     public void update() {
 

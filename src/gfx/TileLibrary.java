@@ -36,7 +36,7 @@ public class TileLibrary {
 
         this.battle = CutSprite.cut(LoadSprite.load("/tiles/4battle.png"), 64, 64, 5, 0);
         for(BufferedImage img: battle){
-            tiles.add(new Tile(img, false));
+            tiles.add(new Tile(img, true));
         }
 
         this.house = CutSprite.cut(LoadSprite.load("/tiles/5houseTiles.png"), 64, 64, 20, 0);

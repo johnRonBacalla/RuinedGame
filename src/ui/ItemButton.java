@@ -24,7 +24,6 @@ public class ItemButton extends UiButton{
         this.itemId = itemId;
 
         this.buttonText = new UiText("x", new Position(this.getPosition().getX() + 44, this.getPosition().getY() + 49), 15, false);
-        buttonText.setText(String.valueOf(inventory.getItemStack(itemId).getQuantity()));
     }
 
     @Override
@@ -34,6 +33,7 @@ public class ItemButton extends UiButton{
         if(inventory.getEquippedItem() == inventory.getItem(itemId)){
             currentImage = equipedImage;
         }
+        buttonText.setText(String.valueOf(inventory.getItemStack(itemId).getQuantity()));
     }
 
     @Override

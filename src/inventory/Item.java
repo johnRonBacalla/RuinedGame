@@ -16,7 +16,9 @@ public abstract class Item {
 
     public String getName() { return name; }
     public BufferedImage getIcon() { return icon; }
-
+    public int getId(){
+        return id;
+    }
     public abstract void update();
 
     public abstract void render(Graphics2D g);

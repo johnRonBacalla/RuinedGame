@@ -10,16 +10,14 @@ public class Chest extends GameObject {
     public Chest(double x, double y, SpriteLibrary sprites) {
         super(x, y, sprites);
 
-        Animate chest = new Animate(sprites.get("objChestClosed"), 1);
+        Animate chest = new Animate(sprites.get("objChestClosed"), 9);
 
         // Store it in GameObject's animation map
         animations.put("objChestClosed", chest);
 
 
-
         // Set this as the current animation
         currentAnimation = chest;
-
     }
 
 }
