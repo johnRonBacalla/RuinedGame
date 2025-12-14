@@ -27,15 +27,19 @@ import java.util.*;
 //wind_seed,1,3
 //gold,2,1
 
+import java.io.*;
+import java.util.*;
+
 public class SaveManager {
-    private static final String SAVE_FILE = "res/saves/game_save.txt";
+    private static final String SAVE_DIR = "res/saves/";
 
-    // Save game data
-    public static void saveGame(int waveNumber, Map<String, List<String>> gameData) {
+    // Save game data to a specific file
+    public static void saveGame(String fileName, int waveNumber, Map<String, List<String>> gameData) {
         try {
-            File saveFile = new File(SAVE_FILE);
-            saveFile.getParentFile().mkdirs();
+            File saveDir = new File(SAVE_DIR);
+            saveDir.mkdirs();
 
+            File saveFile = new File(SAVE_DIR + fileName + ".txt");
             BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile));
 
             // Write wave number
@@ -61,7 +65,7 @@ public class SaveManager {
             }
 
             writer.close();
-            System.out.println("Game saved successfully!");
+            System.out.println("Game saved to: " + fileName + ".txt");
 
         } catch (IOException e) {
             System.err.println("Save failed: " + e.getMessage());
@@ -74,7 +78,7 @@ public class SaveManager {
         try {
             File saveFile = new File(filePath);
             if (!saveFile.exists()) {
-                System.out.println("No save file found");
+                System.out.println("No save file found at: " + filePath);
                 return null;
             }
 
@@ -118,7 +122,7 @@ public class SaveManager {
             saveData.put("wave", waveNumber);
             saveData.put("sections", sections);
 
-            System.out.println("Game loaded successfully!");
+            System.out.println("Game loaded from: " + filePath);
             System.out.println("Wave: " + waveNumber);
             System.out.println("Sections found: " + sections.keySet());
 
@@ -139,18 +143,37 @@ public class SaveManager {
         return line.split(",", -1);
     }
 
-    // Check if file exists
-    public static boolean saveExists() {
-        return new File(SAVE_FILE).exists();
+    // Check if a specific save file exists
+    public static boolean saveExists(String fileName) {
+        return new File(SAVE_DIR + fileName + ".txt").exists();
     }
 
-    // Delete a file
-    public static boolean deleteSave() {
-        File saveFile = new File(SAVE_FILE);
+    // Delete a specific save file
+    public static boolean deleteSave(String fileName) {
+        File saveFile = new File(SAVE_DIR + fileName + ".txt");
         if (saveFile.exists()) {
             return saveFile.delete();
         }
         return false;
     }
 
+    // Get all save files
+    public static List<String> getAllSaveFiles() {
+        File saveDir = new File(SAVE_DIR);
+        if (!saveDir.exists()) {
+            saveDir.mkdirs();
+            return new ArrayList<>();
+        }
+
+        File[] files = saveDir.listFiles((dir, name) -> name.endsWith(".txt"));
+        List<String> saveFiles = new ArrayList<>();
+
+        if (files != null) {
+            for (File file : files) {
+                saveFiles.add(file.getName().replace(".txt", ""));
+            }
+        }
+
+        return saveFiles;
+    }
 }
