@@ -32,7 +32,8 @@ public abstract class Tower extends GameObject {
     public enum TowerType {
         PROJECTILE,  // Shoots projectiles at enemies
         AOE,         // Area damage around tower
-        WALL         // Creates walls/barriers
+        WALL,        // Creates walls/barriers
+        SUPPORT      // Buffs nearby towers
     }
 
     public Tower(double x, double y, SpriteLibrary sprites, TowerType type) {

@@ -6,7 +6,10 @@ import core.Game;
 import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
+import entity.moving.Skele;
+import entity.placeable.towers.EarthTower1;
 import entity.placeable.towers.Tower;
+import entity.placeable.towers.WindTower1;
 import entity.stable.Bridge;
 import entity.stable.Chest;
 import gfx.SpriteLibrary;
@@ -356,6 +359,7 @@ public class PlayState extends State {
         Location currentLocation = mm.getCurrentLocation();
         mouseInMap = mm.getMouseTile(mouseInput, camera);
 
+        // ===== PLACEMENT AND REMOVAL SYSTEM =====
         // Only allow placement in FARM and BATTLE
         if (currentLocation == Location.FARM || currentLocation == Location.BATTLE) {
 
@@ -446,6 +450,8 @@ public class PlayState extends State {
                 lastPlacePressed = true;
             }
         }
+
+        // ===== WAVE SPAWNING SYSTEM =====
         if (input.isPressed(KeyEvent.VK_ENTER) &&
                 mm.getCurrentLocation() == Location.BATTLE &&
                 !waveSpawner.isWaveActive()) {
@@ -463,16 +469,18 @@ public class PlayState extends State {
             lastPlacePressed = false;
         }
 
+        // ===== INVENTORY TOGGLE =====
         if (input.isPressed(KeyEvent.VK_E)) {
             inventoryOpen = !inventoryOpen;
         }
 
-        // Update all towers (add after updating worldObjects)
+        // ===== TOWER UPDATES =====
+        // Update all towers with their specific behaviors
         for (GameObject obj : worldObjects) {
             if (obj instanceof Tower) {
                 Tower tower = (Tower) obj;
 
-                // Collect all enemies for tower to detect
+                // Collect all enemies for tower targeting
                 List<MovingEntity> enemies = new ArrayList<>();
                 for (GameObject enemy : worldObjects) {
                     if (enemy instanceof MovingEntity && !(enemy instanceof Player)) {
@@ -480,11 +488,51 @@ public class PlayState extends State {
                     }
                 }
 
-                // Update tower with enemy list
+                // Update tower with enemy list (handles targeting and attacking)
                 tower.updateTower(enemies);
+
+                // === SPECIAL TOWER BEHAVIORS ===
+
+                // Wind Tower (Support) - Buffs nearby towers
+                if (tower instanceof WindTower1) {
+                    WindTower1 windTower = (WindTower1) tower;
+                    windTower.updateSupport(worldObjects);
+                }
+
+                // Earth Tower (Wall) - Add walls to collision and update wall damage
+                if (tower instanceof EarthTower1) {
+                    EarthTower1 earthTower = (EarthTower1) tower;
+
+                    // Update walls with enemy detection for damage-over-time
+                    earthTower.updateWithEnemies(worldObjects);
+
+                    // Add wall collision boxes to worldBoxes so enemies collide with them
+                    for (EarthTower1.Wall wall : earthTower.getActiveWalls()) {
+                        if (!worldBoxes.contains(wall.getCollisionBox())) {
+                            worldBoxes.add(wall.getCollisionBox());
+                        }
+                    }
+                }
             }
         }
 
+        // ===== PLAYER AND ENTITY UPDATES =====
+        // Update player motion
+        player.getMotion().update(controller);
+        player.applyMotion();
+
+        // Update all game objects
+        for (GameObject obj : worldObjects) {
+            if (obj instanceof Player p) {
+                p.update(worldBoxes); // Player needs worldBoxes for collision
+            } else if (obj instanceof Skele skele) {
+                skele.update(worldBoxes); // Enemies need worldBoxes to detect walls
+            } else {
+                obj.update(); // Regular update for other objects
+            }
+        }
+
+        // ===== TOWER RANGE TOGGLE (DEBUG) =====
         // Optional: Toggle tower range display with T key
         if (input.isPressed(KeyEvent.VK_T)) {
             for (GameObject obj : worldObjects) {
@@ -495,7 +543,8 @@ public class PlayState extends State {
             }
         }
 
-        // Handle weapon attacks
+        // ===== WEAPON ATTACK SYSTEM =====
+        // Handle player weapon attacks
         if (!inventoryOpen && input.isPressed(KeyEvent.VK_SPACE)) {
             if (inventory.getEquippedItem() instanceof WeaponItem) {
                 WeaponItem weapon = (WeaponItem) inventory.getEquippedItem();
@@ -503,36 +552,7 @@ public class PlayState extends State {
             }
         }
 
-        mouseTile.setText(String.valueOf(mouseInMap));
-
-        player.getMotion().update(controller);
-        player.applyMotion();
-
-        for (GameObject obj : worldObjects) {
-            if (obj instanceof Player p) p.update(worldBoxes);
-            else obj.update();
-        }
-
-        if (inventoryOpen) {
-            for (UiComponent component : inventoryView) {
-                component.update();
-                if (component instanceof UiButton button) {
-                    button.update(mouseInput.getMouseX(), mouseInput.getMouseY(), mouseInput.isLeftPressed());
-                }
-            }
-        }
-
-        for(UiComponent component: hud){
-            component.update();
-        }
-
-        if(inventory.getEquippedItem() != null){
-            inventory.getEquippedItem().update();
-        }
-
-        sortObjectsByPosition();
-        camera.update(player);
-
+        // Check weapon hitbox collisions with enemies
         if (inventory.getEquippedItem() instanceof WeaponItem) {
             WeaponItem weapon = (WeaponItem) inventory.getEquippedItem();
 
@@ -547,8 +567,39 @@ public class PlayState extends State {
             }
         }
 
+        // ===== UI UPDATES =====
+        // Update mouse tile display
+        mouseTile.setText(String.valueOf(mouseInMap));
 
+        // Update inventory UI
+        if (inventoryOpen) {
+            for (UiComponent component : inventoryView) {
+                component.update();
+                if (component instanceof UiButton button) {
+                    button.update(mouseInput.getMouseX(), mouseInput.getMouseY(), mouseInput.isLeftPressed());
+                }
+            }
+        }
 
+        // Update HUD
+        for (UiComponent component : hud) {
+            component.update();
+        }
+
+        // Update equipped item
+        if (inventory.getEquippedItem() != null) {
+            inventory.getEquippedItem().update();
+        }
+
+        // ===== RENDERING PREP =====
+        // Sort objects by Y position for proper depth rendering
+        sortObjectsByPosition();
+
+        // Update camera to follow player
+        camera.update(player);
+
+        // ===== CLEANUP DEAD ENEMIES =====
+        // Remove dead enemies from the world
         List<GameObject> toRemove = new ArrayList<>();
         for (GameObject obj : worldObjects) {
             if (obj instanceof MovingEntity && !(obj instanceof Player)) {
@@ -560,7 +611,6 @@ public class PlayState extends State {
         }
         worldObjects.removeAll(toRemove);
         worldBoxes.removeIf(box -> toRemove.stream().anyMatch(obj -> obj.getBox() == box));
-
     }
 
     @Override

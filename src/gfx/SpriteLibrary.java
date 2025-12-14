@@ -71,6 +71,8 @@ public class SpriteLibrary {
         loadSheet("earthTower2", "/placeable/earthTower2.png", 15, 64, 64, 0);
         loadSheet("windTower2", "/placeable/windTower2.png", 15, 64, 64, 0);
 
+        loadSheet("earthWall", "/assets/earthWall.png", 1, 64, 64, 0);
+
         loadSheet("skeleAnim", "/mobs/skele.png", 4, 64, 64, 0);
 
     }
