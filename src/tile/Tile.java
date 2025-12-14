@@ -24,4 +24,9 @@ public class Tile {
     public void render(Graphics2D g, int x, int y, int size) {
         g.drawImage(sprite, x, y, size, size, null);
     }
+
+    // Add to Tile class
+    public void setSolid(boolean solid) {
+        this.solid = solid;
+    }
 }

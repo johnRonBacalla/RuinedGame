@@ -1,4 +1,4 @@
-package entity.stable;
+package entity.npc;
 
 import entity.GameObject;
 import gfx.Animate;

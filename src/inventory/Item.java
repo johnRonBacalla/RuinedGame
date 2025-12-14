@@ -1,5 +1,6 @@
 package inventory;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public abstract class Item {
@@ -13,12 +14,12 @@ public abstract class Item {
         this.icon = icon;
     }
 
-    public int getId() { return id; }
     public String getName() { return name; }
     public BufferedImage getIcon() { return icon; }
+    public int getId(){
+        return id;
+    }
+    public abstract void update();
 
-    public void onEquip() {}
-    public void onUse() {}
-    public void onPlace() {}
+    public abstract void render(Graphics2D g);
 }
-

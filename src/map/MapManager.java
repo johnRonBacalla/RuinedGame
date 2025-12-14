@@ -2,13 +2,16 @@ package map;
 
 import data.GameLoader;
 import data.SaveManager;
+import display.camera.Camera;
 import entity.GameObject;
 import entity.stable.*;
 import gfx.SpriteLibrary;
+import input.MouseInput;
 import map.location.BattleMap;
 import map.location.FHouseMap;
 import map.location.FarmMap;
 import map.location.MinesMap;
+import physics.Position;
 import physics.box.Box;
 import tile.Tile;
 import tile.TileScale;
@@ -93,18 +96,18 @@ public class MapManager {
         topBorder.setCollision(0, -16, 36, 4);
 
         Border leftBorder = new Border(TileScale.of(0), TileScale.of(0), sprites);
-        leftBorder.setCollision(0, 0, 3, 15);
+        leftBorder.setCollision(0, 0, 3, 17);
 
         Border rightBorder = new Border(TileScale.of(36), TileScale.of(0), sprites);
         rightBorder.setCollision(0, 0, 1, 15);
 
-        Border bottomBorder = new Border(TileScale.of(0), TileScale.of(15), sprites);
+        Border bottomBorder = new Border(TileScale.of(0), TileScale.of(17), sprites);
         bottomBorder.setCollision(0, 0, 36, 1);
 
         Border topRiver = new Border(TileScale.of(29), TileScale.of(4), sprites);
         topRiver.setCollision(0, -48, 4, 6);
 
-        Border bottomRiver = new Border(TileScale.of(29), TileScale.of(11), sprites);
+        Border bottomRiver = new Border(TileScale.of(29), TileScale.of(13), sprites);
         bottomRiver.setCollision(0, 16, 4, 4);
 
         Gate minesGate = new Gate(TileScale.of(21), TileScale.of(3), sprites);
@@ -241,6 +244,13 @@ public class MapManager {
             case MINES  -> currentMap = mines;
             case HOUSE  -> currentMap = house;
         }
+    }
+
+    public Point getMouseTile(MouseInput mouse, Camera camera){
+        int worldX = mouse.getMouseX() + (int) camera.getX();
+        int worldY = mouse.getMouseY() + (int) camera.getY();
+
+        return new Point(worldX / 64, worldY / 64);
     }
 
     public Map getCurrentMap() {

@@ -182,6 +182,10 @@ public class Player extends MovingEntity {
         }
     }
 
+    public int getDirection() {
+        return direction;
+    }
+
     private void handleWalkingSound() {
         boolean isWalking = getMotion().isMoving();
 

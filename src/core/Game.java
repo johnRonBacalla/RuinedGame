@@ -1,10 +1,13 @@
 package core;
 
 import display.Display;
+import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
 import physics.Size;
-import state.PlayState;
+import state.MenuState;
+import state.SaveState;
+import state.State;
 import state.StateManager;
 
 public class Game {
@@ -16,14 +19,16 @@ public class Game {
     private KeyInput keyInput;
     private MouseInput mouseInput;
     private StateManager state;
+    private SpriteLibrary spriteLibrary;
 
     public Game(int width, int height) {
+        this.spriteLibrary = new SpriteLibrary();
         keyInput = new KeyInput();
         mouseInput = new MouseInput();
         display = new Display(width, height, keyInput, mouseInput);
         windowSize = new Size(width, height);
         state = new StateManager();
-        state.setCurrent(new PlayState(this, keyInput, mouseInput));
+        state.setCurrent(new MenuState(this, spriteLibrary, keyInput, mouseInput));
     }
 
     public void update() {
@@ -31,6 +36,13 @@ public class Game {
             state.update();
         }
     }
+
+    public void setState(State newState) {
+        if (state != null) {
+            state.setCurrent(newState);
+        }
+    }
+
 
     public void render() {
         display.render(state.getCurrentState());

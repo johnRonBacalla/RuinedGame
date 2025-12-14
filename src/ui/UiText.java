@@ -6,7 +6,6 @@ import physics.Size;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.io.File;
 import java.io.IOException;
 
 public class UiText extends UiComponent {
@@ -31,6 +30,10 @@ public class UiText extends UiComponent {
         calculateSize();
     }
 
+    public void setHovered(boolean is){
+        hovered = is;
+    }
+
     private void loadFont(String fontPath, int fontSize) {
         try {
             // Load font as a resource stream
@@ -46,13 +49,21 @@ public class UiText extends UiComponent {
     }
 
     private void calculateSize() {
-        if (font != null && text != null) {
-            FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
-            int textWidth = (int) font.getStringBounds(text, frc).getWidth();
-            int textHeight = (int) font.getStringBounds(text, frc).getHeight();
-            size = new Size(textWidth + shadowOffsetX, textHeight + shadowOffsetY);
+        if (font == null || text == null) return;
+
+        String[] lines = text.split("\n");
+        int maxWidth = 0;
+        FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
+
+        for (String line : lines) {
+            int lineWidth = (int) font.getStringBounds(line, frc).getWidth();
+            if (lineWidth > maxWidth) maxWidth = lineWidth;
         }
+
+        int lineHeight = (int) font.getStringBounds("Ay", frc).getHeight(); // approx height
+        size = new Size(maxWidth + shadowOffsetX, lineHeight * lines.length + shadowOffsetY);
     }
+
 
     public void setText(String text) {
         this.text = text;
@@ -96,12 +107,21 @@ public class UiText extends UiComponent {
 
         g.setFont(font);
 
-        // Draw shadow first
-        g.setColor(shadowColor);
-        g.drawString(text, getPosition().intX() + shadowOffsetX, getPosition().intY() + size.getHeight() + shadowOffsetY);
+        int lineHeight = g.getFontMetrics().getHeight();
 
-        // Draw main text
-        g.setColor(hoverable && hovered ? hoverColor : color);
-        g.drawString(text, getPosition().intX(), getPosition().intY() + size.getHeight());
+        String[] lines = text.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            int yPos = getPosition().intY() + lineHeight * (i + 1);
+
+            // Draw shadow
+            g.setColor(shadowColor);
+            g.drawString(lines[i], getPosition().intX() + shadowOffsetX, yPos + shadowOffsetY);
+
+            // Draw main text
+            g.setColor(hoverable && hovered ? hoverColor : color);
+            g.drawString(lines[i], getPosition().intX(), yPos);
+        }
     }
+
 }

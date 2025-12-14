@@ -59,6 +59,11 @@ public class GameObject {
 
     public Position getPosition() { return position; }
 
+    public void setPosition(double x, double y){
+        getPosition().setX(x);
+        getPosition().setY(y);
+    }
+
     public Box getBox() {
         return box;
     }

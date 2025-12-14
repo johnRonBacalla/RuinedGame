@@ -34,15 +34,42 @@ public class SpriteLibrary {
         loadSheet("objRockTwo", "/objects/rockTwo.png", 1, 64, 56, 0);
         loadSheet("objBed", "/objects/bed.png", 1, 96, 128, 0);
 
-        loadSheet("itemButton", "/assets/itemButton.png", 2, 76, 76, 0);
+        loadSheet("itemButton", "/assets/itemButton.png", 3, 76, 76, 0);
         loadSheet("longButton", "/assets/longButton.png", 2, 288, 86, 0);
         loadSheet("midButton", "/assets/midButton.png", 2, 164, 86, 0);
         loadSheet("shortButton", "/assets/shortButton.png", 2, 90, 86, 0);
-
+        loadSheet("fenceButton", "/assets/fenceButton.png", 2, 172, 378, 0);
         loadSheet("giantButton", "/assets/giantButton.png", 2, 576, 172, 0);
         loadSheet("logo", "/assets/logo.png", 1, 690, 214, 0);
 
         loadSheet("catalog", "/assets/catalog.png", 16, 64, 64, 0);
+
+        loadSheet("swordIdle", "/weapons/rightSword.png", 9, 192, 192, 0);
+        loadSheet("swordAttack", "/weapons/rightSword.png", 9, 192, 192, 1);
+        loadSheet("hammerIdle", "/weapons/rightHammer.png", 9, 192, 192, 0);
+        loadSheet("hammerAttack", "/weapons/rightHammer.png", 9, 192, 192, 1);
+        loadSheet("spearIdle", "/weapons/rightSpear.png", 9, 192, 192, 0);
+        loadSheet("spearAttack", "/weapons/rightSpear.png", 9, 192, 192, 1);
+
+        loadSheet("firePlant", "/placeable/firePlant.png", 9, 64, 64, 0);
+        loadSheet("icePlant", "/placeable/icePlant.png", 9, 64, 64, 0);
+        loadSheet("earthPlant", "/placeable/earthPlant.png", 9, 64, 64, 0);
+        loadSheet("windPlant", "/placeable/windPlant.png", 9, 64, 64, 0);
+
+        loadSheet("fireReady", "/placeable/fireReady.png", 9, 64, 64, 0);
+        loadSheet("iceReady", "/placeable/iceReady.png", 9, 64, 64, 0);
+        loadSheet("earthReady", "/placeable/earthReady.png", 9, 64, 64, 0);
+        loadSheet("windReady", "/placeable/windReady.png", 9, 64, 64, 0);
+
+        loadSheet("fireTower1", "/placeable/fireTower1.png", 15, 64, 64, 0);
+        loadSheet("iceTower1", "/placeable/iceTower1.png", 15, 64, 64, 0);
+        loadSheet("earthTower1", "/placeable/earthTower1.png", 15, 64, 64, 0);
+        loadSheet("windTower1", "/placeable/windTower1.png", 15, 64, 64, 0);
+
+        loadSheet("fireTower2", "/placeable/fireTower2.png", 15, 64, 64, 0);
+        loadSheet("iceTower2", "/placeable/iceTower2.png", 15, 64, 64, 0);
+        loadSheet("earthTower2", "/placeable/earthTower2.png", 15, 64, 64, 0);
+        loadSheet("windTower2", "/placeable/windTower2.png", 15, 64, 64, 0);
     }
 
     private void loadSheet(String key, String path, int frameCount, int width, int height, int row) {

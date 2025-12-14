@@ -11,11 +11,11 @@ import entity.stable.Chest;
 import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
-import inventory.InventoryManager;
-import inventory.InventoryScale;
+import inventory.*;
 import map.*;
 import physics.Position;
 import physics.box.Box;
+import tile.Tile;
 import tile.TileScale;
 import ui.ItemButton;
 import ui.UiButton;
@@ -31,7 +31,6 @@ public class PlayState extends State {
 
     private final PlayerController controller;
     private final MovingEntity player;
-    private final SpriteLibrary sprites;
 
     private final MapManager mm;
     private Map currentMap;
@@ -52,14 +51,20 @@ public class PlayState extends State {
 
     private InventoryManager inventory;
 
-    public PlayState(Game game, KeyInput input, MouseInput mouseInput) {
-        super(game, input, mouseInput);
+    private List<UiComponent> hud;
+    private Point mouseInMap;
+    private UiText mouseTile;
+
+    private PlacementManager placementManager;
+
+    public static int Day = 1;
+    public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
+        super(game, spriteLibrary, input, mouseInput);
 
         this.game = game;
         controller = new PlayerController(input);
-        sprites = new SpriteLibrary();
-        inventory = new InventoryManager(sprites);
         inventoryView = new ArrayList<>();
+        hud = new ArrayList<>();
 
         worldObjects = new ArrayList<>();
         worldBoxes = new ArrayList<>();
@@ -68,11 +73,12 @@ public class PlayState extends State {
         currentObject = new ArrayList<>();
 
         // Player always separate first
-        player = new Player(this, TileScale.of(15), TileScale.of(8), 5, sprites);
+        player = new Player(this, TileScale.of(15), TileScale.of(8), 5, spriteLibrary);
         worldObjects.add(player);
+        inventory = new InventoryManager(spriteLibrary, (Player) player);
 
         // Map Manager + debug map
-        mm = new MapManager(sprites);
+        mm = new MapManager(spriteLibrary);
         debug = new GridMap(36, 15);
 
         //fetch objects
@@ -82,6 +88,7 @@ public class PlayState extends State {
         currentMap = mm.getCurrentMap();
         worldObjects.addAll(currentObject);
         worldBoxes.addAll(currentBox);
+        placementManager = new PlacementManager(spriteLibrary, mm);
 //        debug = new GridMap(26, 15);
 
 //        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
@@ -111,6 +118,7 @@ public class PlayState extends State {
 //            worldBoxes.add(obj.getBox());
 //        }
         initializeInventory();
+        initializeHud();
 
         // Camera setup
         camera = new Camera(
@@ -120,94 +128,150 @@ public class PlayState extends State {
                 currentMap.getHeightInPx()
         );
 
-        inventoryOpen = true;
+        mouseInMap = mm.getMouseTile(mouseInput, camera);
+
+        inventoryOpen = false;
         inventory.printInventory();
     }
 
+    private void initializeHud() {
+        mouseTile = new UiText("test", new Position(100, 100), 36, false);
+        hud.add(mouseTile);
+    }
+
     private void initializeInventory() {
-        UiButton item1 = new ItemButton(sprites, inventory,
+        UiButton item1 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(2)), 1, () -> {
-            System.out.println(inventory.getItemName(1));
+
+            if(inventory.getItemStack(1).getQuantity() != 0){
+                System.out.println(inventory.getItemName(1));
+                handleItemEquip(1);
+            }
         });
 
-        UiButton item2 = new ItemButton(sprites, inventory,
+        UiButton item2 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(2)), 2, () -> {
-            System.out.println(inventory.getItemName(2));
+            if(inventory.getItemStack(2).getQuantity() != 0){
+                System.out.println(inventory.getItemName(2));
+                handleItemEquip(2);
+            }
         });
-        UiButton item3 = new ItemButton(sprites, inventory,
+        UiButton item3 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(2)), 3, () -> {
-            System.out.println(inventory.getItemName(3));
+            if(inventory.getItemStack(3).getQuantity() != 0){
+                System.out.println(inventory.getItemName(3));
+                handleItemEquip(3);
+            }
         });
-        UiButton item4 = new ItemButton(sprites, inventory,
+        UiButton item4 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(2)), 4, () -> {
-            System.out.println(inventory.getItemName(4));
+            if(inventory.getItemStack(4).getQuantity() != 0){
+                System.out.println(inventory.getItemName(4));
+                handleItemEquip(4);
+            }
         });
 
-        UiButton item5 = new ItemButton(sprites, inventory,
+        UiButton item5 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(3)), 5, () -> {
-            System.out.println(inventory.getItemName(5));
+            if(inventory.getItemStack(5).getQuantity() != 0){
+                System.out.println(inventory.getItemName(5));
+                handleItemEquip(5);
+            }
         });
-        UiButton item6 = new ItemButton(sprites, inventory,
+        UiButton item6 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(3)), 6, () -> {
-            System.out.println(inventory.getItemName(6));
+            if(inventory.getItemStack(6).getQuantity() != 0){
+                System.out.println(inventory.getItemName(6));
+                handleItemEquip(6);
+            }
         });
-        UiButton item7 = new ItemButton(sprites, inventory,
+        UiButton item7 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(3)), 7, () -> {
-            System.out.println(inventory.getItemName(7));
+            if(inventory.getItemStack(7).getQuantity() != 0){
+                System.out.println(inventory.getItemName(7));
+                handleItemEquip(7);
+            }
         });
-        UiButton item8 = new ItemButton(sprites, inventory,
+        UiButton item8 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(3)), 8, () -> {
-            System.out.println(inventory.getItemName(8));
+            if(inventory.getItemStack(8).getQuantity() != 0){
+                System.out.println(inventory.getItemName(8));
+                handleItemEquip(8);
+            }
         });
 
-        UiButton item9 = new ItemButton(sprites, inventory,
+        UiButton item9 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(4)), 9, () -> {
-            System.out.println(inventory.getItemName(9));
+            if(inventory.getItemStack(9).getQuantity() != 0){
+                System.out.println(inventory.getItemName(9));
+                handleItemEquip(9);
+            }
         });
-        UiButton item10 = new ItemButton(sprites, inventory,
+        UiButton item10 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(4)), 10, () -> {
-            System.out.println(inventory.getItemName(10));
+            if(inventory.getItemStack(10).getQuantity() != 0){
+                System.out.println(inventory.getItemName(10));
+                handleItemEquip(10);
+            }
         });
-        UiButton item11 = new ItemButton(sprites, inventory,
+        UiButton item11 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(4)), 11, () -> {
-            System.out.println(inventory.getItemName(11));
+            if(inventory.getItemStack(11).getQuantity() != 0){
+                System.out.println(inventory.getItemName(11));
+                handleItemEquip(11);
+            }
         });
-        UiButton item12 = new ItemButton(sprites, inventory,
+        UiButton item12 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(4)), 12, () -> {
-            System.out.println(inventory.getItemName(12));
+            if(inventory.getItemStack(12).getQuantity() != 0){
+                System.out.println(inventory.getItemName(12));
+                handleItemEquip(12);
+            }
         });
 
-        UiButton item13 = new ItemButton(sprites, inventory,
+        UiButton item13 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(1),
                         InventoryScale.of(5)), 13, () -> {
-            System.out.println(inventory.getItemName(13));
+            if(inventory.getItemStack(13).getQuantity() != 0){
+                System.out.println(inventory.getItemName(13));
+                handleItemEquip(13);
+            }
         });
-        UiButton item14 = new ItemButton(sprites, inventory,
+        UiButton item14 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(2),
                         InventoryScale.of(5)), 14, () -> {
-            System.out.println(inventory.getItemName(14));
+            if(inventory.getItemStack(14).getQuantity() != 0){
+                System.out.println(inventory.getItemName(14));
+                handleItemEquip(14);
+            }
         });
-        UiButton item15 = new ItemButton(sprites, inventory,
+        UiButton item15 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(3),
                         InventoryScale.of(5)), 15, () -> {
-            System.out.println(inventory.getItemName(15));
+            if(inventory.getItemStack(15).getQuantity() != 0){
+                System.out.println(inventory.getItemName(15));
+                handleItemEquip(15);
+            }
         });
-        UiButton item16 = new ItemButton(sprites, inventory,
+        UiButton item16 = new ItemButton(spriteLibrary, inventory,
                 new Position(InventoryScale.of(4),
                         InventoryScale.of(5)), 16, () -> {
-            System.out.println(inventory.getItemName(16));
+            if(inventory.getItemStack(16).getQuantity() != 0){
+                System.out.println(inventory.getItemName(16));
+                handleItemEquip(16);
+            }
         });
 
         inventoryView.add(item1);
@@ -228,20 +292,29 @@ public class PlayState extends State {
         inventoryView.add(item16);
     }
 
-    public void placeChest(int tileX, int tileY) {
-        Chest chest = new Chest(TileScale.of(tileX), TileScale.of(tileY), sprites);
+    public void handleItemEquip(int itemId){
+        if(inventory.getEquippedItem() != inventory.getItem(itemId)){
+            inventory.setEquippedItem(itemId);
+        } else inventory.removeEquippedItem();
+    }
 
-        // Add to MapManager (persists across map changes)
-        mm.addObject(mm.getCurrentLocation(), chest);
+    public void reassignAll(Location location){
+        // Filter out removed objects
+        for (GameObject obj : mm.getCurrentMapObjects()) {
+            if (!placementManager.wasRemoved(location, obj)) {
+                currentObject.add(obj);
+            }
+        }
 
-        currentObject.add(chest);
-        worldObjects.add(chest);
+        for (GameObject obj : currentObject) {
+            currentBox.add(obj.getBox());
+        }
 
-        currentBox.add(chest.getBox());
-        worldBoxes.add(chest.getBox());
+        worldObjects.add(player);
+        worldBoxes.add(player.getBox());
 
-        System.out.println("Placed chest at (" + tileX + ", " + tileY + ")");
-
+        worldObjects.addAll(currentObject);
+        worldBoxes.addAll(currentBox);
     }
 
     public void saveGame() {
@@ -253,52 +326,6 @@ public class PlayState extends State {
         return mm;
     }
     private boolean lastPlacePressed = false;
-
-    @Override
-    public void update() {
-        if (controller.isRequestingPlaceItem() && !lastPlacePressed) {
-            int playerTileX = TileScale.in(player.getPosition().getX());
-            int playerTileY = TileScale.in(player.getPosition().getY());
-            placeChest(playerTileX, playerTileY);
-            lastPlacePressed = true;
-
-
-        }
-
-        if (!controller.isRequestingPlaceItem()) {
-            lastPlacePressed = false;
-        }
-        if (input.isPressed(KeyEvent.VK_E)) {
-            inventoryOpen = !inventoryOpen;
-        }
-
-        player.getMotion().update(controller);
-        player.applyMotion();
-        for (GameObject obj : worldObjects) {
-            if (obj instanceof Player p) p.update(worldBoxes);
-            else obj.update();
-        }
-
-        if (inventoryOpen) {
-            for (UiComponent component : inventoryView) {
-
-                // Call default update first (safe for all)
-                component.update();
-
-                // Only buttons receive mouse input
-                if (component instanceof UiButton button) {
-                    button.update(
-                            mouseInput.mouseX,
-                            mouseInput.mouseY,
-                            mouseInput.isLeftPressed()
-                    );
-                }
-            }
-        }
-
-        sortObjectsByPosition();
-        camera.update(player);
-    }
 
     private void sortObjectsByPosition() {
         worldObjects.sort((a, b) -> {
@@ -318,6 +345,147 @@ public class PlayState extends State {
     }
 
     @Override
+    public void update() {
+        Location currentLocation = mm.getCurrentLocation();
+        mouseInMap = mm.getMouseTile(mouseInput, camera);
+
+        // Only allow placement in FARM and BATTLE
+        if (currentLocation == Location.FARM || currentLocation == Location.BATTLE) {
+
+            // SHOVEL EQUIPPED
+            if (inventory.getEquippedItem() instanceof WeaponItem &&
+                    inventory.getEquippedItem().getId() == 4) {
+
+                // R key = Remove placeable
+                if (input.isPressed(KeyEvent.VK_R)) {
+                    placementManager.removeObjectAt(
+                            mouseInMap.x, mouseInMap.y, currentMap, currentLocation,
+                            currentObject, worldObjects, currentBox, worldBoxes
+                    );
+                }
+
+                // F key = Harvest
+                if (input.isPressed(KeyEvent.VK_F)) {
+                    System.out.println("harvest");
+                }
+            }
+            // PLACEABLE ITEMS - Left click to place
+            else if (inventory.getEquippedItem() instanceof PlaceableItem &&
+                    controller.isRequestingPlaceItem() && !lastPlacePressed) {
+
+                PlaceableItem placeable = (PlaceableItem) inventory.getEquippedItem();
+                GameObject placedObject = null;
+
+                switch (placeable.getId()) {
+                    case 9: // Fire Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeFirePlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeFireTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 10: // Ice Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeIcePlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeIceTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 11: // Earth Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeEarthPlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeEarthTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 12: // Wind Rune I
+                        placedObject = currentLocation == Location.FARM
+                                ? placementManager.placeWindPlant(mouseInMap.x, mouseInMap.y, currentMap, currentLocation)
+                                : placementManager.placeWindTower1(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 13: // Fire Rune II
+                        placedObject = placementManager.placeFireTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 14: // Ice Rune II
+                        placedObject = placementManager.placeIceTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 15: // Earth Rune II
+                        placedObject = placementManager.placeEarthTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+
+                    case 16: // Wind Rune II
+                        placedObject = placementManager.placeWindTower2(mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+                        break;
+                }
+
+                // Add placed object to world
+                if (placedObject != null) {
+                    mm.addObject(currentLocation, placedObject);
+                    currentObject.add(placedObject);
+                    worldObjects.add(placedObject);
+                    currentBox.add(placedObject.getBox());
+                    worldBoxes.add(placedObject.getBox());
+
+                    // Decrement quantity
+                    ItemStack stack = inventory.getItemStack(placeable.getId());
+                    if (stack != null && stack.getQuantity() > 0) {
+                        stack.setQuantity(stack.getQuantity() - 1);
+                        if (stack.getQuantity() == 0) {
+                            inventory.removeEquippedItem();
+                        }
+                    }
+                }
+
+                lastPlacePressed = true;
+            }
+        }
+
+        if (!controller.isRequestingPlaceItem()) {
+            lastPlacePressed = false;
+        }
+        if (input.isPressed(KeyEvent.VK_E)) {
+            inventoryOpen = !inventoryOpen;
+        }
+
+        // Handle weapon attacks
+        if (!inventoryOpen && input.isPressed(KeyEvent.VK_SPACE)) {
+            if (inventory.getEquippedItem() instanceof WeaponItem) {
+                WeaponItem weapon = (WeaponItem) inventory.getEquippedItem();
+                weapon.attack();
+            }
+        }
+
+        mouseTile.setText(String.valueOf(mouseInMap));
+
+        player.getMotion().update(controller);
+        player.applyMotion();
+        for (GameObject obj : worldObjects) {
+            if (obj instanceof Player p) p.update(worldBoxes);
+            else obj.update();
+        }
+
+        if (inventoryOpen) {
+            for (UiComponent component : inventoryView) {
+                component.update();
+                if (component instanceof UiButton button) {
+                    button.update(mouseInput.getMouseX(), mouseInput.getMouseY(), mouseInput.isLeftPressed());
+                }
+            }
+        }
+
+        for(UiComponent component: hud){
+            component.update();
+        }
+
+        if(inventory.getEquippedItem() != null){
+            inventory.getEquippedItem().update();
+        }
+
+        sortObjectsByPosition();
+        camera.update(player);
+    }
+
+    @Override
     public void render(Graphics2D g) {
         camera.apply(g);
 
@@ -331,8 +499,6 @@ public class PlayState extends State {
 
         mm.render(g, view);
 
-        debug.render(g);
-
         for (GameObject obj : worldObjects) {
             Rectangle objRect = new Rectangle(
                     (int) obj.getPosition().getX(),
@@ -343,17 +509,33 @@ public class PlayState extends State {
 
             if (view.intersects(objRect)) {
                 obj.render(g);
+
+                if (obj instanceof Player && inventory.getEquippedItem() instanceof WeaponItem) {
+                    ((WeaponItem) inventory.getEquippedItem()).render(g);
+                }
             }
         }
 
-        // Render collision boxes (optional)
+        Location currentLocation = mm.getCurrentLocation();
+
+        // Only show previews in FARM and BATTLE
+        if (!inventoryOpen && (currentLocation == Location.FARM || currentLocation == Location.BATTLE)) {
+            // Green/Red preview for placeable items
+            if (inventory.getEquippedItem() instanceof PlaceableItem) {
+                placementManager.renderPlacementPreview(g, mouseInMap.x, mouseInMap.y, currentMap, currentLocation);
+            }
+            // Blue outline for shovel
+            else if (inventory.getEquippedItem() instanceof WeaponItem && inventory.getEquippedItem().getId() == 4) {
+                placementManager.renderShovelOutline(g, mouseInMap.x, mouseInMap.y, currentMap);
+            }
+        }
+
+        // Render collision boxes (debug)
         for (GameObject obj : worldObjects) {
             Box box = obj.getBox();
             Rectangle boxRect = new Rectangle(
-                    (int) box.getX(),
-                    (int) box.getY(),
-                    (int) box.getWidth(),
-                    (int) box.getHeight()
+                    (int) box.getX(), (int) box.getY(),
+                    (int) box.getWidth(), (int) box.getHeight()
             );
 
             if (view.intersects(boxRect)) {
@@ -361,6 +543,7 @@ public class PlayState extends State {
                     case "col" -> g.setColor(Color.RED);
                     case "sensor" -> g.setColor(Color.YELLOW);
                     case "event" -> g.setColor(Color.ORANGE);
+                    case "hit" -> g.setColor(Color.GREEN);
                 }
                 obj.renderBox(g);
             }
@@ -369,6 +552,13 @@ public class PlayState extends State {
         camera.reset(g);
 
         if(inventoryOpen){
+            for(UiComponent components: inventoryView){
+                components.render(g);
+            }
+        }
+
+        for(UiComponent component: hud){
+            component.render(g);
         }
     }
 
@@ -379,17 +569,6 @@ public class PlayState extends State {
         worldBoxes.clear();
     }
 
-    public void reassignAll(){
-        currentObject.addAll(mm.getCurrentMapObjects());
-        currentBox.addAll(mm.getCurrentMapBoxes());
-
-        worldObjects.add(player);
-        worldBoxes.add(player.getBox());
-
-        worldObjects.addAll(currentObject);
-        worldBoxes.addAll(currentBox);
-    }
-
     public void changeCurrentMap(Location type) {
         mm.changeMap(type);
         currentMap = mm.getCurrentMap();
@@ -398,19 +577,19 @@ public class PlayState extends State {
         switch (type){
             case MINES:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
             case BATTLE:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
             case FARM:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
             case HOUSE:
                 mm.changeCurrentObjects(type);
-                reassignAll();
+                reassignAll(type);
                 break;
         }
 

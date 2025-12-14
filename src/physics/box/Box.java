@@ -34,6 +34,15 @@ public abstract class Box {
     // Abstract method for behavior on collision
     public abstract void onCollide(Box other);
 
+    // Add these methods to physics.box.Box
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
     public abstract String getType();
 
     public abstract String getSignal();
@@ -44,5 +53,14 @@ public abstract class Box {
 
     public void setHeightTile(int height){
         this.height = TileScale.of(height);
+    }
+
+    // Add to physics.box.Box class
+    public void setOffsetX(double offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public void setOffsetY(double offsetY) {
+        this.offsetY = offsetY;
     }
 }
