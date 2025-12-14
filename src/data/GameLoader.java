@@ -28,7 +28,7 @@ public class GameLoader {
         state.waveNumber = wave;
         state.sections = sections;
         state.towers = loadTowers(sections.get("TOWERS"), sprites);
-        state.seeds = loadSeeds(sections.get("SEEDS"), sprites);
+        // Don't call loadSeeds anymore, we'll handle it separately
         state.chestItems = loadChestItems(sections.get("CHEST_ITEMS"));
         state.playerInventory = loadPlayerInventory(sections.get("PLAYER_INVENTORY"));
 
@@ -102,37 +102,51 @@ public class GameLoader {
     }
 
     // Load seeds
-    public static List<GameObject> loadSeeds(List<String> lines, SpriteLibrary sprites) {
-        List<GameObject> seeds = new ArrayList<>();
+    // Load seeds
+    public static Map<String, List<GameObject>> loadSeedsByLocation(List<String> lines, SpriteLibrary sprites) {
+        Map<String, List<GameObject>> seedsByLocation = new HashMap<>();
+        seedsByLocation.put("FARM", new ArrayList<>());
+        seedsByLocation.put("BATTLE", new ArrayList<>());
+        seedsByLocation.put("MINES", new ArrayList<>());
+        seedsByLocation.put("HOUSE", new ArrayList<>());
 
         if (lines == null || lines.isEmpty()) {
-            return seeds;
+            return seedsByLocation;
         }
 
-        // Skip header line
+        // Skip header line (plant_type,x,y,location,stage)
         for (int i = 1; i < lines.size(); i++) {
             String[] parts = SaveManager.parseLine(lines.get(i));
-            String seedType = parts[0];
+            String plantType = parts[0];  // fire, ice, earth, wind
             int x = Integer.parseInt(parts[1]);
             int y = Integer.parseInt(parts[2]);
-            int stage = Integer.parseInt(parts[3]);
+            String location = parts[3];  // FARM, BATTLE, etc.
+            int stage = Integer.parseInt(parts[4]);  // growth stage
 
-            switch (seedType) {
-                case "wind" -> {
-                    // GameObject seed = new WindSeed(TileScale.of(x), TileScale.of(y), stage, sprites);
-                    // seeds.add(seed);
-                    System.out.println("TODO: Create wind seed at (" + x + "," + y + ") stage " + stage);
-                }
+            GameObject plant = null;
+
+            switch (plantType) {
                 case "fire" -> {
-                    // GameObject seed = new FireSeed(TileScale.of(x), TileScale.of(y), stage, sprites);
-                    // seeds.add(seed);
-                    System.out.println("TODO: Create fire seed at (" + x + "," + y + ") stage " + stage);
+                    plant = new entity.placeable.FirePlant(TileScale.of(x), TileScale.of(y), stage, sprites);
                 }
-                default -> System.out.println("Unknown seed type: " + seedType);
+                case "ice" -> {
+                    plant = new entity.placeable.IcePlant(TileScale.of(x), TileScale.of(y), stage, sprites);
+                }
+                case "earth" -> {
+                    plant = new entity.placeable.EarthPlant(TileScale.of(x), TileScale.of(y), stage, sprites);
+                }
+                case "wind" -> {
+                    plant = new entity.placeable.WindPlant(TileScale.of(x), TileScale.of(y), stage, sprites);
+                }
+                default -> System.out.println("Unknown plant type: " + plantType);
+            }
+
+            if (plant != null) {
+                seedsByLocation.get(location).add(plant);
             }
         }
 
-        return seeds;
+        return seedsByLocation;
     }
 
     // Load chest items (returns map of chest ID -> list of items)
