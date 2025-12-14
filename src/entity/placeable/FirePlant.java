@@ -21,13 +21,17 @@ public class FirePlant extends GameObject {
     }
 
     private void updateAnimation() {
-        // You can change animation based on stage if you have different sprites
-        animations.put("firePlant", new Animate(sprites.get("firePlant"), 12));
-        currentAnimation = animations.get("firePlant");
+        if(growthStage == 0){
+            animations.put("firePlant", new Animate(sprites.get("firePlant"), 12));
+            currentAnimation = animations.get("firePlant");
+        } else {
+            animations.put("fireReady", new Animate(sprites.get("fireReady"), 12));
+            currentAnimation = animations.get("fireReady");
+        }
     }
 
     public void grow() {
-        if (growthStage < 3) {
+        if (growthStage < 1) {
             growthStage++;
             updateAnimation();
         }

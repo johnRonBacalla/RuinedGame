@@ -74,6 +74,15 @@ public class SpriteLibrary {
         loadSheet("earthWall", "/assets/earthWall.png", 1, 64, 64, 0);
 
         loadSheet("skeleAnim", "/mobs/skele.png", 4, 64, 64, 0);
+        loadSheet("batAnim", "/mobs/bat.png", 3, 64, 64, 0);
+        loadSheet("goblinAnim", "/mobs/goblin.png", 4, 64, 64, 0);
+        loadSheet("golemAnim", "/mobs/golem.png", 8, 128, 128, 0);
+        loadSheet("magmaBomberAnim", "/mobs/magmaBomber.png", 3, 64, 64, 0);
+        loadSheet("ogreAnim", "/mobs/ogre.png", 8, 96, 96, 0);
+        loadSheet("succubusAnim", "/mobs/succubus.png", 4, 64, 64, 0);
+        loadSheet("witchAnim", "/mobs/witch.png", 4, 64, 64, 0);
+
+
 
     }
 
