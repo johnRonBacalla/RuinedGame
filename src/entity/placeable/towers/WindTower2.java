@@ -5,8 +5,13 @@ import gfx.SpriteLibrary;
 
 public class WindTower2 extends Tower{
     public WindTower2(double x, double y, SpriteLibrary sprites) {
-        super(x, y, sprites);
+        super(x, y, sprites, TowerType.AOE);
         animations.put("windTower2", new Animate(sprites.get("windTower2"), 12));
         currentAnimation = animations.get("windTower2");
+    }
+
+    @Override
+    protected void attack() {
+
     }
 }

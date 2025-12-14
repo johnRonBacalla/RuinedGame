@@ -6,6 +6,7 @@ import core.Game;
 import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
+import entity.placeable.towers.Tower;
 import entity.stable.Bridge;
 import entity.stable.Chest;
 import gfx.SpriteLibrary;
@@ -466,6 +467,34 @@ public class PlayState extends State {
             inventoryOpen = !inventoryOpen;
         }
 
+        // Update all towers (add after updating worldObjects)
+        for (GameObject obj : worldObjects) {
+            if (obj instanceof Tower) {
+                Tower tower = (Tower) obj;
+
+                // Collect all enemies for tower to detect
+                List<MovingEntity> enemies = new ArrayList<>();
+                for (GameObject enemy : worldObjects) {
+                    if (enemy instanceof MovingEntity && !(enemy instanceof Player)) {
+                        enemies.add((MovingEntity) enemy);
+                    }
+                }
+
+                // Update tower with enemy list
+                tower.updateTower(enemies);
+            }
+        }
+
+        // Optional: Toggle tower range display with T key
+        if (input.isPressed(KeyEvent.VK_T)) {
+            for (GameObject obj : worldObjects) {
+                if (obj instanceof Tower) {
+                    Tower tower = (Tower) obj;
+                    tower.setShowRange(!tower.isShowingRange());
+                }
+            }
+        }
+
         // Handle weapon attacks
         if (!inventoryOpen && input.isPressed(KeyEvent.VK_SPACE)) {
             if (inventory.getEquippedItem() instanceof WeaponItem) {
@@ -503,6 +532,35 @@ public class PlayState extends State {
 
         sortObjectsByPosition();
         camera.update(player);
+
+        if (inventory.getEquippedItem() instanceof WeaponItem) {
+            WeaponItem weapon = (WeaponItem) inventory.getEquippedItem();
+
+            if (weapon.getHitBox() != null && weapon.getHitBox().isActive()) {
+                for (GameObject obj : worldObjects) {
+                    // Check if object is a MovingEntity (enemy) and not the player
+                    if (obj instanceof MovingEntity && !(obj instanceof Player)) {
+                        MovingEntity enemy = (MovingEntity) obj;
+                        enemy.checkHitByWeapon(weapon.getHitBox());
+                    }
+                }
+            }
+        }
+
+
+
+        List<GameObject> toRemove = new ArrayList<>();
+        for (GameObject obj : worldObjects) {
+            if (obj instanceof MovingEntity && !(obj instanceof Player)) {
+                MovingEntity enemy = (MovingEntity) obj;
+                if (enemy.isDead()) {
+                    toRemove.add(obj);
+                }
+            }
+        }
+        worldObjects.removeAll(toRemove);
+        worldBoxes.removeIf(box -> toRemove.stream().anyMatch(obj -> obj.getBox() == box));
+
     }
 
     @Override
