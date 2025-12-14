@@ -4,6 +4,10 @@ import data.GameLoader;
 import data.SaveManager;
 import display.camera.Camera;
 import entity.GameObject;
+import entity.placeable.EarthPlant;
+import entity.placeable.FirePlant;
+import entity.placeable.IcePlant;
+import entity.placeable.WindPlant;
 import entity.stable.*;
 import gfx.SpriteLibrary;
 import input.MouseInput;
@@ -40,7 +44,13 @@ public class MapManager {
     private GameLoader.GameState savedFileObjects;
 
 
+    // Original constructor for new games
     public MapManager(SpriteLibrary sprites) {
+        this(sprites, null); // Call the other constructor with null
+    }
+
+    // New constructor that accepts a save file path
+    public MapManager(SpriteLibrary sprites, String saveFilePath) {
         this.sprites = sprites;
 
         this.farm = new FarmMap(0,0);
@@ -53,32 +63,39 @@ public class MapManager {
 
         //load map objects and boxes
         this.farmObjects = SpawnObjects.loadObjects("/mapText/objects/farmObjs.csv", sprites);
-
         this.battleObjects = SpawnObjects.loadObjects("/mapText/objects/battleObjs.csv", sprites);
-
         this.minesObjects = SpawnObjects.loadObjects("/mapText/objects/minesObjs.csv", sprites);
-
         this.houseObjects = SpawnObjects.loadObjects("/mapText/objects/houseObjs.csv", sprites);
 
-        this.savedFileObjects = GameLoader.loadFromSave("res/saves/game_save.txt", sprites);
+        // Load from specific save file OR default
+        String fileToLoad = (saveFilePath != null) ? saveFilePath : "res/saves/game_save.txt";
+        this.savedFileObjects = GameLoader.loadFromSave(fileToLoad, sprites);
 
         loadFarmAssets();
         loadMinesAssets();
         loadBattleAssets();
         loadHouseAssets();
 
-        // Ari mo load ang gikan sa saved file
-
+        // Load saved objects if they exist
         if(savedFileObjects != null){
-            java.util.Map<String, List<GameObject>> loadedObjects =
+            java.util.Map<String, List<GameObject>> loadedPlacables =
                     GameLoader.loadPlacablesByLocation(savedFileObjects.sections.get("PLACABLES"), sprites);
 
-            farmObjects.addAll(loadedObjects.get("FARM"));
-            battleObjects.addAll(loadedObjects.get("BATTLE"));
-            minesObjects.addAll(loadedObjects.get("MINES"));
-            houseObjects.addAll(loadedObjects.get("HOUSE"));
-        }
+            java.util.Map<String, List<GameObject>> loadedSeeds =
+                    GameLoader.loadSeedsByLocation(savedFileObjects.sections.get("SEEDS"), sprites);
 
+            // Add placables
+            farmObjects.addAll(loadedPlacables.get("FARM"));
+            battleObjects.addAll(loadedPlacables.get("BATTLE"));
+            minesObjects.addAll(loadedPlacables.get("MINES"));
+            houseObjects.addAll(loadedPlacables.get("HOUSE"));
+
+            // Add seeds
+            farmObjects.addAll(loadedSeeds.get("FARM"));
+            battleObjects.addAll(loadedSeeds.get("BATTLE"));
+            minesObjects.addAll(loadedSeeds.get("MINES"));
+            houseObjects.addAll(loadedSeeds.get("HOUSE"));
+        }
 
         //initial map
         currentMap = farm;
@@ -206,33 +223,63 @@ public class MapManager {
     public void saveAllObjects(int waveNumber) {
         java.util.Map<String, List<String>> gameData = new HashMap<>();
         List<String> placables = new ArrayList<>();
+        List<String> seeds = new ArrayList<>();
 
-        // CSV Header
+        // CSV Headers
         placables.add("entity_type,x,y,location");
+        seeds.add("plant_type,x,y,location,stage");
 
-        // Save objects from all locations
-        addObjectsToSave(placables, farmObjects, Location.FARM);
-        addObjectsToSave(placables, battleObjects, Location.BATTLE);
-        addObjectsToSave(placables, minesObjects, Location.MINES);
-        addObjectsToSave(placables, houseObjects, Location.HOUSE);
+        // Save objects from ALL locations (both placables AND seeds)
+        addObjectsToSave(placables, seeds, farmObjects, Location.FARM);
+        addObjectsToSave(placables, seeds, battleObjects, Location.BATTLE);
+        addObjectsToSave(placables, seeds, minesObjects, Location.MINES);
+        addObjectsToSave(placables, seeds, houseObjects, Location.HOUSE);
 
         gameData.put("PLACABLES", placables);
+        gameData.put("SEEDS", seeds);
+
         SaveManager.saveGame(waveNumber, gameData);
 
-        System.out.println("Saved " + (placables.size() - 1) + " objects across all locations");
+        System.out.println("Saved " + (placables.size() - 1) + " placables and " + (seeds.size() - 1) + " seeds");
     }
 
-    private void addObjectsToSave(List<String> placables, List<GameObject> objects, Location location) {
+    private void addObjectsToSave(List<String> placables, List<String> seeds, List<GameObject> objects, Location location) {
         for (GameObject obj : objects) {
             if (obj instanceof Chest) {
                 Chest chest = (Chest) obj;
                 int tileX = TileScale.in(chest.getPosition().getX());
                 int tileY = TileScale.in(chest.getPosition().getY());
-
-                placables.add(String.format("chest,%d,%d,%s",
-                        tileX, tileY, location.name()));
+                placables.add(String.format("chest,%d,%d,%s", tileX, tileY, location.name()));
             }
-            // TODO: Add more object types here (Beds, Towers, Seeds, etc.)
+            // Save plants WITH stage
+            else if (obj instanceof FirePlant) {
+                FirePlant plant = (FirePlant) obj;
+                int tileX = TileScale.in(plant.getPosition().getX());
+                int tileY = TileScale.in(plant.getPosition().getY());
+                seeds.add(String.format("fire,%d,%d,%s,%d",
+                        tileX, tileY, location.name(), plant.getGrowthStage()));
+            }
+            else if (obj instanceof IcePlant) {
+                IcePlant plant = (IcePlant) obj;
+                int tileX = TileScale.in(plant.getPosition().getX());
+                int tileY = TileScale.in(plant.getPosition().getY());
+                seeds.add(String.format("ice,%d,%d,%s,%d",
+                        tileX, tileY, location.name(), plant.getGrowthStage()));
+            }
+            else if (obj instanceof EarthPlant) {
+                EarthPlant plant = (EarthPlant) obj;
+                int tileX = TileScale.in(plant.getPosition().getX());
+                int tileY = TileScale.in(plant.getPosition().getY());
+                seeds.add(String.format("earth,%d,%d,%s,%d",
+                        tileX, tileY, location.name(), plant.getGrowthStage()));
+            }
+            else if (obj instanceof WindPlant) {
+                WindPlant plant = (WindPlant) obj;
+                int tileX = TileScale.in(plant.getPosition().getX());
+                int tileY = TileScale.in(plant.getPosition().getY());
+                seeds.add(String.format("wind,%d,%d,%s,%d",
+                        tileX, tileY, location.name(), plant.getGrowthStage()));
+            }
         }
     }
 

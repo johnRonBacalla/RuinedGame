@@ -113,6 +113,7 @@ public class InventoryManager {
         give(10, 2);
         give(11, 2);
         give(12, 2);
+
     }
 
     public void give(int itemId, int quantity) {
