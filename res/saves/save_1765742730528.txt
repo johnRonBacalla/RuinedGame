@@ -1,0 +1,13 @@
+WAVE:1
+
+[SEEDS]
+plant_type,x,y,location,stage
+ice,18,6,FARM,0
+ice,18,7,FARM,0
+ice,19,6,FARM,0
+ice,18,5,FARM,0
+ice,8,10,FARM,0
+
+[PLACABLES]
+entity_type,x,y,location
+

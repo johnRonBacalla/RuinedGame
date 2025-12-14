@@ -1,5 +1,0 @@
-WAVE:1
-
-[PLACABLES]
-entity_type,x,y,location
-

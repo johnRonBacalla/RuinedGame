@@ -29,14 +29,15 @@ import ui.UiText;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State {
 
     private final PlayerController controller;
-    private final Player player;
-
+    private final MovingEntity player;
+    private String currentSaveFileName;
     private final MapManager mm;
     private Map currentMap;
     private final Map debug;
@@ -64,12 +65,28 @@ public class PlayState extends State {
     private int currentWave = 1;
 
     private PlacementManager placementManager;
-
+    private String saveFilePath;
     public static int Day = 1;
+
+    // Constructor for NEW game
     public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
+        this(game, spriteLibrary, input, mouseInput, null); // Call the other constructor
+    }
+
+    // Constructor for LOADING a save
+    public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput, String saveFilePath) {
         super(game, spriteLibrary, input, mouseInput);
 
         this.game = game;
+        // Extract filename from path or create new save name
+        if (saveFilePath != null) {
+            File file = new File(saveFilePath);
+            this.currentSaveFileName = file.getName().replace(".txt", "");
+        } else {
+            // Generate a unique save name for new games
+            this.currentSaveFileName = "save_" + System.currentTimeMillis();
+        }
+
         controller = new PlayerController(input);
         inventoryView = new ArrayList<>();
         hud = new ArrayList<>();
@@ -83,10 +100,10 @@ public class PlayState extends State {
         // Player always separate first
         player = new Player(this, TileScale.of(15), TileScale.of(8), 5, spriteLibrary);
         worldObjects.add(player);
-        inventory = new InventoryManager(spriteLibrary, player);
+        inventory = new InventoryManager(spriteLibrary, (Player) player);
 
-        // Map Manager + debug map
-        mm = new MapManager(spriteLibrary);
+        // Map Manager - pass the save file path
+        mm = new MapManager(spriteLibrary, saveFilePath); // Modified constructor
         debug = new GridMap(36, 15);
 
         //fetch objects
@@ -97,34 +114,7 @@ public class PlayState extends State {
         worldObjects.addAll(currentObject);
         worldBoxes.addAll(currentBox);
         placementManager = new PlacementManager(spriteLibrary, mm);
-//        debug = new GridMap(26, 15);
 
-//        GameLoader.GameState state = GameLoader.loadFromSave("res/saves/game_save.txt", spriteLibrary);
-//
-//        if (state != null) {
-//            System.out.println("Loading Chest ");
-//
-//            worldObjects.addAll(state.placables);
-//
-//            for (GameObject obj : state.placables) {
-//                if (obj instanceof Chest chest) {
-//                    String chestId = chest.getId();
-//                    if (state.chestItems.containsKey(chestId)) {
-//                        chest.setItems(state.chestItems.get(chestId));
-//                        System.out.println("Chest " + chestId + " loaded with items: " + chest.getItems());
-//                    }
-//                }
-//            }
-//        }
-
-        // Load map objects from CSV
-//        List<GameObject> mapObjects = SpawnObjects.loadObjects("/mapText/farmObjs.csv", spriteLibrary);
-//        worldObjects.addAll(mapObjects);
-
-        // Add their collision boxes to worldBoxes
-//        for (GameObject obj : mapObjects) {
-//            worldBoxes.add(obj.getBox());
-//        }
         initializeInventory();
         initializeHud();
 
@@ -328,8 +318,8 @@ public class PlayState extends State {
     }
 
     public void saveGame() {
-        mm.saveAllObjects(1); // Pass wave number
-        System.out.println("Game saved!");
+        mm.saveAllObjects(currentSaveFileName, 1); // Pass the save file name
+        System.out.println("Game saved to: " + currentSaveFileName);
     }
 
     public MapManager getMapManager() {
@@ -617,6 +607,7 @@ public class PlayState extends State {
     public void render(Graphics2D g) {
         camera.apply(g);
 
+        // --- Frustum culling: only render objects inside camera view ---
         Rectangle view = new Rectangle(
                 (int) camera.getX(),
                 (int) camera.getY(),
@@ -727,5 +718,4 @@ public class PlayState extends State {
                 currentMap.getHeightInPx()
         );
     }
-
 }
