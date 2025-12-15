@@ -59,7 +59,7 @@ public class PlayState extends State {
 
     private List<UiComponent> hud;
     private Point mouseInMap;
-    private UiText mouseTile;
+//    private UiText mouseTile;
 
     private WaveSpawner waveSpawner;
     private int currentWave = 1;
@@ -140,8 +140,8 @@ public class PlayState extends State {
     }
 
     private void initializeHud() {
-        mouseTile = new UiText("test", new Position(100, 100), 36, false);
-        hud.add(mouseTile);
+//        mouseTile = new UiText("test", new Position(100, 100), 36, false);
+//        hud.add(mouseTile);
     }
 
     private void initializeInventory() {
@@ -649,7 +649,7 @@ public class PlayState extends State {
 
         // ===== UI UPDATES =====
         // Update mouse tile display
-        mouseTile.setText(String.valueOf(mouseInMap));
+//        mouseTile.setText(String.valueOf(mouseInMap));
 
         // Update inventory UI
         if (inventoryOpen) {
