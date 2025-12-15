@@ -93,6 +93,10 @@ public class WaveSpawner {
         }
     }
 
+    public boolean hasMoreSpawns() {
+        return !spawnQueue.isEmpty();
+    }
+
     /**
      * Updates the spawner and returns list of entities to spawn this frame
      */
@@ -213,5 +217,9 @@ public class WaveSpawner {
         public double getDelay() { return delay; }
         public boolean hasSpawned() { return spawned; }
         public void setSpawned(boolean spawned) { this.spawned = spawned; }
+    }
+
+    public boolean isWaveCleared() {
+        return waveActive;
     }
 }

@@ -245,6 +245,30 @@ public class MapManager {
 
         System.out.println("Saved " + (placables.size() - 1) + " placables and " + (seeds.size() - 1) + " seeds");
     }
+    public void growAllPlants() {
+        growPlantsInList(farmObjects);
+        growPlantsInList(battleObjects);
+        growPlantsInList(minesObjects);
+        growPlantsInList(houseObjects);
+    }
+
+    private void growPlantsInList(List<GameObject> objects) {
+        for (GameObject obj : objects) {
+            if (obj instanceof FirePlant fire) {
+                fire.grow();
+                System.out.println("FirePlant grew to stage: " + fire.getGrowthStage());
+            } else if (obj instanceof IcePlant ice) {
+                ice.grow();
+                System.out.println("IcePlant grew to stage: " + ice.getGrowthStage());
+            } else if (obj instanceof EarthPlant earth) {
+                earth.grow();
+                System.out.println("EarthPlant grew to stage: " + earth.getGrowthStage());
+            } else if (obj instanceof WindPlant wind) {
+                wind.grow();
+                System.out.println("WindPlant grew to stage: " + wind.getGrowthStage());
+            }
+        }
+    }
 
     private void addObjectsToSave(List<String> placables, List<String> seeds, List<GameObject> objects, Location location) {
         for (GameObject obj : objects) {

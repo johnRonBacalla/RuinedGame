@@ -5,11 +5,13 @@ import gfx.Animate;
 import gfx.SpriteLibrary;
 
 public class FirePlant extends GameObject {
-    private int growthStage; // 0 = seed, 1 = sprout, 2 = mature, 3 = harvestable
+
+    // 0 = planted, 1 = ready
+    private int growthStage;
 
     public FirePlant(double x, double y, SpriteLibrary sprites) {
         super(x, y, sprites);
-        this.growthStage = 0; // Start as seed
+        this.growthStage = 0;
         updateAnimation();
     }
 
@@ -21,20 +23,34 @@ public class FirePlant extends GameObject {
     }
 
     private void updateAnimation() {
-        if(growthStage == 0){
-            animations.put("firePlant", new Animate(sprites.get("firePlant"), 12));
-            currentAnimation = animations.get("firePlant");
-        } else {
-            animations.put("fireReady", new Animate(sprites.get("fireReady"), 12));
-            currentAnimation = animations.get("fireReady");
+        String animKey = (growthStage == 0) ? "firePlant" : "fireReady";
+
+        if (!animations.containsKey(animKey)) {
+            animations.put(animKey, new Animate(sprites.get(animKey), 12));
+        }
+
+        currentAnimation = animations.get(animKey);
+    }
+
+    // Called by day progression
+    public void grow() {
+        if (growthStage == 0) {
+            growthStage = 1;
+            updateAnimation();
         }
     }
 
-    public void grow() {
-        if (growthStage < 1) {
-            growthStage++;
-            updateAnimation();
-        }
+    public boolean isHarvestable() {
+        return growthStage == 1;
+    }
+
+    public void harvest() {
+        if (!isHarvestable()) return;
+
+        // TODO: give player fire rune / item here
+
+        growthStage = 0; // reset after harvest
+        updateAnimation();
     }
 
     public int getGrowthStage() {
@@ -44,9 +60,5 @@ public class FirePlant extends GameObject {
     public void setGrowthStage(int stage) {
         this.growthStage = stage;
         updateAnimation();
-    }
-
-    public boolean isHarvestable() {
-        return growthStage >= 3;
     }
 }

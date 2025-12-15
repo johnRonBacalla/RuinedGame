@@ -6,11 +6,15 @@ import core.Game;
 import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
-import entity.moving.mobs.Skele;
+import entity.placeable.EarthPlant;
+import entity.placeable.FirePlant;
+import entity.placeable.IcePlant;
+import entity.placeable.WindPlant;
 import entity.placeable.towers.EarthTower1;
 import entity.placeable.towers.Tower;
 import entity.placeable.towers.WindTower1;
 import entity.stable.Bridge;
+import entity.stable.Chest;
 import gfx.SpriteLibrary;
 import input.KeyInput;
 import input.MouseInput;
@@ -19,11 +23,9 @@ import map.*;
 import physics.Position;
 import physics.box.Box;
 import spawner.WaveSpawner;
+import tile.Tile;
 import tile.TileScale;
-import ui.ItemButton;
-import ui.UiButton;
-import ui.UiComponent;
-import ui.UiText;
+import ui.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -61,10 +63,15 @@ public class PlayState extends State {
 
     private WaveSpawner waveSpawner;
     private int currentWave = 1;
+    private Boolean isWaveCleared = false;
 
     private PlacementManager placementManager;
     private String saveFilePath;
     public static int Day = 1;
+    private UIDialogue dialogue = new UIDialogue(() -> {
+        // Optional: do something when closed
+    });
+
 
     // Constructor for NEW game
     public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
@@ -316,13 +323,25 @@ public class PlayState extends State {
     }
 
     public void saveGame() {
-        mm.saveAllObjects(currentSaveFileName, 1); // Pass the save file name
+        Day++;
+
+        // ===== GROW PLANTS IN ALL LOCATION LISTS =====
+        // Grow plants in MapManager's lists (the ones that get saved)
+        mm.growAllPlants();
+
+        // ===== SAVE AFTER GROWTH =====
+        mm.saveAllObjects(currentSaveFileName, 1);
         System.out.println("Game saved to: " + currentSaveFileName);
     }
 
     public MapManager getMapManager() {
         return mm;
     }
+
+    public boolean isWaveCleared() {
+        return isWaveCleared;
+    }
+
     private boolean lastPlacePressed = false;
 
     private void sortObjectsByPosition() {
@@ -346,6 +365,7 @@ public class PlayState extends State {
     public void update() {
         Location currentLocation = mm.getCurrentLocation();
         mouseInMap = mm.getMouseTile(mouseInput, camera);
+        dialogue.update(mouseInput.getMouseX(), mouseInput.getMouseY(), mouseInput.isLeftPressed());
 
         // ===== PLACEMENT AND REMOVAL SYSTEM =====
         // Only allow placement in FARM and BATTLE
@@ -365,7 +385,51 @@ public class PlayState extends State {
 
                 // F key = Harvest
                 if (input.isPressed(KeyEvent.VK_F)) {
-                    System.out.println("harvest");
+                    // Get the plant at the mouse tile position
+                    GameObject targetPlant = placementManager.getObjectAt(mouseInMap.x, mouseInMap.y, currentLocation);
+
+                    if (targetPlant != null) {
+                        if (targetPlant instanceof FirePlant) {
+                            FirePlant plant = (FirePlant) targetPlant;
+                            if (plant.isHarvestable()) {
+                                plant.harvest();
+                                inventory.give(9, 3); // Give 3 Fire Rune I
+                                System.out.println("Harvested Fire Plant! +3 Fire Runes");
+                            } else {
+                                showDialogue("Plant not ready yet!");
+                            }
+                        }
+                        else if (targetPlant instanceof IcePlant) {
+                            IcePlant plant = (IcePlant) targetPlant;
+                            if (plant.isHarvestable()) {
+                                plant.harvest();
+                                inventory.give(10, 3); // Give 3 Ice Rune I
+                                System.out.println("Harvested Ice Plant! +3 Ice Runes");
+                            } else {
+                                showDialogue("Plant not ready yet!");
+                            }
+                        }
+                        else if (targetPlant instanceof EarthPlant) {
+                            EarthPlant plant = (EarthPlant) targetPlant;
+                            if (plant.isHarvestable()) {
+                                plant.harvest();
+                                inventory.give(11, 3); // Give 3 Earth Rune I
+                                System.out.println("Harvested Earth Plant! +3 Earth Runes");
+                            } else {
+                                showDialogue("Plant not ready yet!");
+                            }
+                        }
+                        else if (targetPlant instanceof WindPlant) {
+                            WindPlant plant = (WindPlant) targetPlant;
+                            if (plant.isHarvestable()) {
+                                plant.harvest();
+                                inventory.give(12, 3); // Give 3 Wind Rune I
+                                System.out.println("Harvested Wind Plant! +3 Wind Runes");
+                            } else {
+                                showDialogue("Plant not ready yet!");
+                            }
+                        }
+                    }
                 }
             }
             // PLACEABLE ITEMS - Left click to place
@@ -444,6 +508,7 @@ public class PlayState extends State {
                 mm.getCurrentLocation() == Location.BATTLE &&
                 !waveSpawner.isWaveActive()) {
 
+            isWaveCleared = false; // Reset flag when new wave starts
             waveSpawner.startWave("/spawns/wave" + currentWave + ".txt");
         }
 
@@ -503,7 +568,7 @@ public class PlayState extends State {
                     windTower.updateSupport(worldObjects);
                 }
 
-                // Earth Tower (Wall) - Add active wall collision boxes
+                // Earth Tower (Wall) - Add walls to collision and update wall damage
                 if (tower instanceof EarthTower1) {
                     EarthTower1 earthTower = (EarthTower1) tower;
 
@@ -532,7 +597,6 @@ public class PlayState extends State {
                 obj.update();
             }
         }
-
 
         // ===== TOWER RANGE TOGGLE (DEBUG) =====
         // Optional: Toggle tower range display with T key
@@ -613,6 +677,18 @@ public class PlayState extends State {
         }
         worldObjects.removeAll(toRemove);
         worldBoxes.removeIf(box -> toRemove.stream().anyMatch(obj -> obj.getBox() == box));
+
+        // Check if wave is cleared (no spawns left AND no enemies alive)
+        if (mm.getCurrentLocation() == Location.BATTLE) {
+            boolean anyEnemiesLeft = worldObjects.stream()
+                    .anyMatch(obj -> obj instanceof MovingEntity && !(obj instanceof Player));
+
+            // Wave is cleared when spawner has no more spawns AND no enemies are alive
+            if (!waveSpawner.hasMoreSpawns() && !anyEnemiesLeft && !isWaveCleared) {
+                isWaveCleared = true;
+                System.out.println("Wave cleared! You can now rest.");
+            }
+        }
     }
 
     @Override
@@ -690,6 +766,8 @@ public class PlayState extends State {
         for(UiComponent component: hud){
             component.render(g);
         }
+
+        dialogue.render(g);
     }
 
     public void clearAll(){
@@ -697,6 +775,10 @@ public class PlayState extends State {
         currentBox.clear();
         worldObjects.clear();
         worldBoxes.clear();
+    }
+
+    public void showDialogue(String message) {
+        dialogue.show(message);
     }
 
     public void changeCurrentMap(Location type) {

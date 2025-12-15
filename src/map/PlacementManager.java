@@ -56,6 +56,25 @@ public class PlacementManager {
         return !occupiedTiles.get(currentLocation).contains(tilePoint);
     }
 
+    public GameObject getObjectAt(int tileX, int tileY, Location location) {
+        List<GameObject> objects = mapManager.getCurrentMapObjects(); // ← Change mm to mapManager
+
+        for (GameObject obj : objects) {
+            // Check if this is a plant/placeable at the target tile
+            int objTileX = TileScale.in(obj.getPosition().getX());
+            int objTileY = TileScale.in(obj.getPosition().getY());
+            if (objTileX == tileX && objTileY == tileY) {
+                // Only return plants (not gates, borders, etc.)
+                if (obj instanceof FirePlant || obj instanceof IcePlant ||
+                        obj instanceof EarthPlant || obj instanceof WindPlant) {
+                    return obj;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private GameObject placeObject(GameObject obj, int tileX, int tileY, Map currentMap, Location currentLocation) {
         if (!canPlaceAt(tileX, tileY, currentMap, currentLocation)) {
             return null;

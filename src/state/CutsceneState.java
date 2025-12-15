@@ -136,19 +136,6 @@ public class CutsceneState extends State {
             g.drawImage(currentSlide, offsetX, offsetY, newW, newH, null);
         }
 
-        // Optional subtle dark overlay at bottom for button visibility
-        g.setColor(new Color(0, 0, 0, 100));
-        g.fillRect(0, stateSize.getHeight() - 250, stateSize.getWidth(), 250);
 
-        // Always render NEXT and SKIP buttons
-
-        // On the LAST slide, show big "CLICK TO START" text instead of relying on button text
-        if (currentSlideIndex == slidePaths.size() - 1) {
-            // Optional: add shadow for readability
-            g.setColor(new Color(0, 0, 0, 180));
-            g.fillRect(0, stateSize.getHeight() / 2 + 80, stateSize.getWidth(), 100);
-
-            startPrompt.render(g);
-        }
     }
 }
