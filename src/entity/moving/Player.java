@@ -133,15 +133,18 @@ public class Player extends MovingEntity {
                         break;
                     case "saveGame":
                         touchingSaveBoxThisFrame = true;
-
-                        // Only save if we haven't saved during this entry
                         if (!hasSavedThisEntry) {
-                            hasSavedThisEntry = true;  // Mark as saved
+                            hasSavedThisEntry = true;
 
-                            Display.startFade(() -> {
-                                state.saveGame();
-                                restartCamera = true;
-                            });
+                            if (state.isWaveCleared()) {
+                                Display.startFade(() -> {
+                                    state.saveGame();
+                                    restartCamera = true;
+                                });
+                            } else {
+                                // Show UI message instead of console
+                                state.showDialogue("Monsters are nearby.\nCan't sleep yet!");
+                            }
                         }
                         break;
                 }

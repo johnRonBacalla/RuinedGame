@@ -7,6 +7,10 @@ import entity.GameObject;
 import entity.moving.MovingEntity;
 import entity.moving.Player;
 import entity.moving.Skele;
+import entity.placeable.EarthPlant;
+import entity.placeable.FirePlant;
+import entity.placeable.IcePlant;
+import entity.placeable.WindPlant;
 import entity.placeable.towers.EarthTower1;
 import entity.placeable.towers.Tower;
 import entity.placeable.towers.WindTower1;
@@ -22,10 +26,7 @@ import physics.box.Box;
 import spawner.WaveSpawner;
 import tile.Tile;
 import tile.TileScale;
-import ui.ItemButton;
-import ui.UiButton;
-import ui.UiComponent;
-import ui.UiText;
+import ui.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -34,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State {
-
     private final PlayerController controller;
     private final MovingEntity player;
     private String currentSaveFileName;
@@ -63,10 +63,15 @@ public class PlayState extends State {
 
     private WaveSpawner waveSpawner;
     private int currentWave = 1;
+    private Boolean isWaveCleared = false;
 
     private PlacementManager placementManager;
     private String saveFilePath;
     public static int Day = 1;
+    private UIDialogue dialogue = new UIDialogue(() -> {
+        // Optional: do something when closed
+    });
+
 
     // Constructor for NEW game
     public PlayState(Game game, SpriteLibrary spriteLibrary, KeyInput input, MouseInput mouseInput) {
@@ -318,13 +323,25 @@ public class PlayState extends State {
     }
 
     public void saveGame() {
-        mm.saveAllObjects(currentSaveFileName, 1); // Pass the save file name
+        Day++;
+
+        // ===== GROW PLANTS IN ALL LOCATION LISTS =====
+        // Grow plants in MapManager's lists (the ones that get saved)
+        mm.growAllPlants();
+
+        // ===== SAVE AFTER GROWTH =====
+        mm.saveAllObjects(currentSaveFileName, 1);
         System.out.println("Game saved to: " + currentSaveFileName);
     }
 
     public MapManager getMapManager() {
         return mm;
     }
+
+    public boolean isWaveCleared() {
+        return isWaveCleared;
+    }
+
     private boolean lastPlacePressed = false;
 
     private void sortObjectsByPosition() {
@@ -348,6 +365,7 @@ public class PlayState extends State {
     public void update() {
         Location currentLocation = mm.getCurrentLocation();
         mouseInMap = mm.getMouseTile(mouseInput, camera);
+        dialogue.update(mouseInput.getMouseX(), mouseInput.getMouseY(), mouseInput.isLeftPressed());
 
         // ===== PLACEMENT AND REMOVAL SYSTEM =====
         // Only allow placement in FARM and BATTLE
@@ -446,6 +464,7 @@ public class PlayState extends State {
                 mm.getCurrentLocation() == Location.BATTLE &&
                 !waveSpawner.isWaveActive()) {
 
+            isWaveCleared = false; // Reset flag when new wave starts
             waveSpawner.startWave("/spawns/wave" + currentWave + ".txt");
         }
 
@@ -601,6 +620,18 @@ public class PlayState extends State {
         }
         worldObjects.removeAll(toRemove);
         worldBoxes.removeIf(box -> toRemove.stream().anyMatch(obj -> obj.getBox() == box));
+
+        // Check if wave is cleared (no spawns left AND no enemies alive)
+        if (mm.getCurrentLocation() == Location.BATTLE) {
+            boolean anyEnemiesLeft = worldObjects.stream()
+                    .anyMatch(obj -> obj instanceof MovingEntity && !(obj instanceof Player));
+
+            // Wave is cleared when spawner has no more spawns AND no enemies are alive
+            if (!waveSpawner.hasMoreSpawns() && !anyEnemiesLeft && !isWaveCleared) {
+                isWaveCleared = true;
+                System.out.println("Wave cleared! You can now rest.");
+            }
+        }
     }
 
     @Override
@@ -678,6 +709,8 @@ public class PlayState extends State {
         for(UiComponent component: hud){
             component.render(g);
         }
+
+        dialogue.render(g);
     }
 
     public void clearAll(){
@@ -685,6 +718,10 @@ public class PlayState extends State {
         currentBox.clear();
         worldObjects.clear();
         worldBoxes.clear();
+    }
+
+    public void showDialogue(String message) {
+        dialogue.show(message);
     }
 
     public void changeCurrentMap(Location type) {

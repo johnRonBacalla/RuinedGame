@@ -5,11 +5,13 @@ import gfx.Animate;
 import gfx.SpriteLibrary;
 
 public class WindPlant extends GameObject {
-    private int growthStage; // 0 = seed, 1 = sprout, 2 = mature, 3 = harvestable
+
+    // 0 = planted, 1 = ready
+    private int growthStage;
 
     public WindPlant(double x, double y, SpriteLibrary sprites) {
         super(x, y, sprites);
-        this.growthStage = 0; // Start as seed
+        this.growthStage = 0;
         updateAnimation();
     }
 
@@ -21,16 +23,33 @@ public class WindPlant extends GameObject {
     }
 
     private void updateAnimation() {
-        // You can change animation based on stage if you have different sprites
-        animations.put("windPlant", new Animate(sprites.get("windPlant"), 12));
-        currentAnimation = animations.get("windPlant");
+        String animKey = (growthStage == 0) ? "windPlant" : "windReady";
+
+        if (!animations.containsKey(animKey)) {
+            animations.put(animKey, new Animate(sprites.get(animKey), 12));
+        }
+
+        currentAnimation = animations.get(animKey);
     }
 
     public void grow() {
-        if (growthStage < 3) {
-            growthStage++;
+        if (growthStage == 0) {
+            growthStage = 1;
             updateAnimation();
         }
+    }
+
+    public boolean isHarvestable() {
+        return growthStage == 1;
+    }
+
+    public void harvest() {
+        if (!isHarvestable()) return;
+
+        // TODO: give wind item
+
+        growthStage = 0;
+        updateAnimation();
     }
 
     public int getGrowthStage() {
@@ -40,9 +59,5 @@ public class WindPlant extends GameObject {
     public void setGrowthStage(int stage) {
         this.growthStage = stage;
         updateAnimation();
-    }
-
-    public boolean isHarvestable() {
-        return growthStage >= 3;
     }
 }

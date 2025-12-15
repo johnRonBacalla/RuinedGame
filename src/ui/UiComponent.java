@@ -27,7 +27,14 @@ public abstract class UiComponent {
                 mouseY <= y + h;
     }
 
+    // Old parameterless update - keep for backward compatibility if needed
     public void update(){}
+
+    // NEW: Add this method - default does nothing
+    public void update(int mouseX, int mouseY, boolean mousePressed) {
+        // Default behavior: do nothing
+        // Subclasses like UiButton, UiText, SignButton will override this
+    }
 
     public abstract void render(Graphics2D g);
 
