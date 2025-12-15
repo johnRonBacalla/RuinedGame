@@ -130,19 +130,19 @@ public class MovingEntity extends GameObject {
     @Override
     public void render(Graphics2D g) {
         // Flash red when hit
-        if (wasHit && hitFlashTimer % 4 < 2) {
-            // Draw red tint
-            Composite oldComposite = g.getComposite();
-            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-            g.setColor(Color.RED);
-            g.fillRect(
-                    (int) position.getX(),
-                    (int) position.getY(),
-                    currentAnimation.getCurrentFrame().getWidth(),
-                    currentAnimation.getCurrentFrame().getHeight()
-            );
-            g.setComposite(oldComposite);
-        }
+//        if (wasHit && hitFlashTimer % 4 < 2) {
+//            // Draw red tint
+//            Composite oldComposite = g.getComposite();
+//            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+//            g.setColor(Color.RED);
+//            g.fillRect(
+//                    (int) position.getX(),
+//                    (int) position.getY(),
+//                    currentAnimation.getCurrentFrame().getWidth(),
+//                    currentAnimation.getCurrentFrame().getHeight()
+//            );
+//            g.setComposite(oldComposite);
+//        }
 
         super.render(g);
 
@@ -150,7 +150,7 @@ public class MovingEntity extends GameObject {
         renderHpBar(g);
 
         // Debug: Render hurtbox
-        renderHurtBox(g);
+//        renderHurtBox(g);
     }
 
     /**

@@ -384,6 +384,7 @@ public class PlayState extends State {
                 }
 
                 // F key = Harvest
+                // F key = Harvest
                 if (input.isPressed(KeyEvent.VK_F)) {
                     // Get the plant at the mouse tile position
                     GameObject targetPlant = placementManager.getObjectAt(mouseInMap.x, mouseInMap.y, currentLocation);
@@ -392,8 +393,12 @@ public class PlayState extends State {
                         if (targetPlant instanceof FirePlant) {
                             FirePlant plant = (FirePlant) targetPlant;
                             if (plant.isHarvestable()) {
-                                plant.harvest();
                                 inventory.give(9, 3); // Give 3 Fire Rune I
+                                // Remove the plant instead of resetting to stage 0
+                                placementManager.removeObjectAt(
+                                        mouseInMap.x, mouseInMap.y, currentMap, currentLocation,
+                                        currentObject, worldObjects, currentBox, worldBoxes
+                                );
                                 System.out.println("Harvested Fire Plant! +3 Fire Runes");
                             } else {
                                 showDialogue("Plant not ready yet!");
@@ -402,8 +407,11 @@ public class PlayState extends State {
                         else if (targetPlant instanceof IcePlant) {
                             IcePlant plant = (IcePlant) targetPlant;
                             if (plant.isHarvestable()) {
-                                plant.harvest();
                                 inventory.give(10, 3); // Give 3 Ice Rune I
+                                placementManager.removeObjectAt(
+                                        mouseInMap.x, mouseInMap.y, currentMap, currentLocation,
+                                        currentObject, worldObjects, currentBox, worldBoxes
+                                );
                                 System.out.println("Harvested Ice Plant! +3 Ice Runes");
                             } else {
                                 showDialogue("Plant not ready yet!");
@@ -412,8 +420,11 @@ public class PlayState extends State {
                         else if (targetPlant instanceof EarthPlant) {
                             EarthPlant plant = (EarthPlant) targetPlant;
                             if (plant.isHarvestable()) {
-                                plant.harvest();
                                 inventory.give(11, 3); // Give 3 Earth Rune I
+                                placementManager.removeObjectAt(
+                                        mouseInMap.x, mouseInMap.y, currentMap, currentLocation,
+                                        currentObject, worldObjects, currentBox, worldBoxes
+                                );
                                 System.out.println("Harvested Earth Plant! +3 Earth Runes");
                             } else {
                                 showDialogue("Plant not ready yet!");
@@ -422,8 +433,11 @@ public class PlayState extends State {
                         else if (targetPlant instanceof WindPlant) {
                             WindPlant plant = (WindPlant) targetPlant;
                             if (plant.isHarvestable()) {
-                                plant.harvest();
                                 inventory.give(12, 3); // Give 3 Wind Rune I
+                                placementManager.removeObjectAt(
+                                        mouseInMap.x, mouseInMap.y, currentMap, currentLocation,
+                                        currentObject, worldObjects, currentBox, worldBoxes
+                                );
                                 System.out.println("Harvested Wind Plant! +3 Wind Runes");
                             } else {
                                 showDialogue("Plant not ready yet!");
@@ -744,15 +758,15 @@ public class PlayState extends State {
                     (int) box.getWidth(), (int) box.getHeight()
             );
 
-            if (view.intersects(boxRect)) {
-                switch (box.getType()) {
-                    case "col" -> g.setColor(Color.RED);
-                    case "sensor" -> g.setColor(Color.YELLOW);
-                    case "event" -> g.setColor(Color.ORANGE);
-                    case "hit" -> g.setColor(Color.GREEN);
-                }
-                obj.renderBox(g);
-            }
+//            if (view.intersects(boxRect)) {
+//                switch (box.getType()) {
+//                    case "col" -> g.setColor(Color.RED);
+//                    case "sensor" -> g.setColor(Color.YELLOW);
+//                    case "event" -> g.setColor(Color.ORANGE);
+//                    case "hit" -> g.setColor(Color.GREEN);
+//                }
+//                obj.renderBox(g);
+//            }
         }
 
         camera.reset(g);

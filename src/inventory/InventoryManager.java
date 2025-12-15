@@ -103,7 +103,7 @@ public class InventoryManager {
     // Start inventory with all items but 0 quantity
     private void initializeInventory() {
         for (int itemId : itemCatalog.keySet()) {
-            inventory.put(itemId, new ItemStack(itemCatalog.get(itemId), 10));
+            inventory.put(itemId, new ItemStack(itemCatalog.get(itemId), 0));
         }
         give(1, 1);
         give(2, 1);

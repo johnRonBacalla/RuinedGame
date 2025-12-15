@@ -161,12 +161,12 @@ public class Player extends MovingEntity {
 
     public void render(Graphics2D g){
         super.render(g);
-        g.setColor(Color.GREEN);
-        g.drawRect(
-                (int)sensor.getX(),
-                (int)sensor.getY(),
-                (int)sensor.getWidth(),
-                (int)sensor.getHeight());
+//        g.setColor(Color.GREEN);
+//        g.drawRect(
+//                (int)sensor.getX(),
+//                (int)sensor.getY(),
+//                (int)sensor.getWidth(),
+//                (int)sensor.getHeight());
     }
 
     private void handleAnimation() {

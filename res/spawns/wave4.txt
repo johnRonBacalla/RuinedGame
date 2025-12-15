@@ -1,0 +1,8 @@
+Skele,5,3
+ArmoredSkele,4,3
+Goblin,6,8
+ArmoredSkele,5,1
+Goblin,6,8
+Skele,6,3
+Goblin,6,1
+ArmoredSkele,6,0

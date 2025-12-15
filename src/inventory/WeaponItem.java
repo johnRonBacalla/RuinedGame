@@ -155,26 +155,26 @@ public class WeaponItem extends Item {
                     weaponX, weaponY,
                     -192, 192,
                     null);
-            g.drawRect(weaponX - 128, weaponY, 192, 192);
+//            g.drawRect(weaponX - 128, weaponY, 192, 192);
         } else {
             g.drawImage(frame, weaponX, weaponY, null);
-            g.drawRect(weaponX, weaponY, 192, 192);
+//            g.drawRect(weaponX, weaponY, 192, 192);
         }
 
-        // Debug text
-        g.setColor(Color.WHITE);
-        g.drawString("WEAPON: " + (facingLeft ? "LEFT" : "RIGHT"), weaponX - 128, weaponY - 10);
-
-        // NEW: Show delay timer
-        if (waitingToActivateHitbox) {
-            g.setColor(Color.YELLOW);
-            g.drawString("Delay: " + hitboxDelayTimer, weaponX - 128, weaponY - 25);
-        }
-
-        // Render debug hitbox
-        if (debugHitbox && hitBox != null && hitBox.isActive()) {
-            renderDebugHitbox(g);
-        }
+//        // Debug text
+//        g.setColor(Color.WHITE);
+//        g.drawString("WEAPON: " + (facingLeft ? "LEFT" : "RIGHT"), weaponX - 128, weaponY - 10);
+//
+//        // NEW: Show delay timer
+//        if (waitingToActivateHitbox) {
+//            g.setColor(Color.YELLOW);
+//            g.drawString("Delay: " + hitboxDelayTimer, weaponX - 128, weaponY - 25);
+//        }
+//
+//        // Render debug hitbox
+//        if (debugHitbox && hitBox != null && hitBox.isActive()) {
+//            renderDebugHitbox(g);
+//        }
     }
 
     private void renderDebugHitbox(Graphics2D g) {
