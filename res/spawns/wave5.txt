@@ -1,9 +1,0 @@
-Skele,8,3
-ArmoredSkele,6,1
-Goblin,6,8
-Goblin,10,3
-Ogre,1,8
-Skele,10,5
-ArmoredSkele,6,5
-Ogre,3,6
-Goblin,8,0
